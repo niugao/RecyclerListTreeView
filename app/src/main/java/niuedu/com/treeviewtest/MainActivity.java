@@ -52,23 +52,23 @@ public class MainActivity extends AppCompatActivity {
         ExampleListTreeAdapter.ContactInfo contact;
         Bitmap bitmap= BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
         contact = new ExampleListTreeAdapter.ContactInfo(
-                bitmap,"西门广大","[在线]咱长病的人，就是不一样");
+                bitmap,"王二","[在线]我是王二");
         ListTree.TreeNode contactNode1=tree.addNode(groupNode2,contact,R.layout.contacts_contact_item);
         ListTree.TreeNode contactNode2=tree.addNode(groupNode5,contact,R.layout.contacts_contact_item);
         //再添加一个
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
-        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"东邪吸毒","[离线]出来卖，总是要还价的");
+        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"王三","[离线]我没有状态");
         tree.addNode(groupNode2,contact,R.layout.contacts_contact_item);
         tree.addNode(groupNode5,contact,R.layout.contacts_contact_item);
 
         //第三层
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
-        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"东邪吸毒","[离线]出来卖，总是要还价的");
+        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"东邪","[离线]出来还价");
         ListTree.TreeNode n=tree.addNode(contactNode1,contact,R.layout.contacts_contact_item);
         n.setShowExpandIcon(false);
         //再添加一个
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
-        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"东邪吸毒","[离线]出来卖，总是要还价的");
+        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"李圆圆","[离线]昨天出门没出去");
         n=tree.addNode(contactNode1,contact,R.layout.contacts_contact_item);
         n.setShowExpandIcon(false);
 
