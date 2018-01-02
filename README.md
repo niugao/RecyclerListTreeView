@@ -10,6 +10,7 @@ I am special because:
 5) Less half amount of code to other`s implemetion.
 
 ＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+
 基于RecyclerView，自认为是当前最快的 Android tree view 的实现了！！
 
 存储数据的结构并不是Tree，而是一个ArrayList。与所有已知的网上的实现都不一样，大家似乎都跳不出固定思维。
@@ -26,8 +27,8 @@ I am special because:
 5 不需对RecyclerView做任何改动
 
 有诗为证：
- 远看像棵树
- 近看不是树
- 似树而非树
- 是为牛逼树
+远看像棵树
+近看不是树
+似树而非树
+是为牛逼树
 
