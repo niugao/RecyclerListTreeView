@@ -1,15 +1,14 @@
 # RecyclerListTreeView
 
-The fastest android Tree View based on RecyclerView in the world!!
+`The fastest android Tree View based on RecyclerView in the world!!`
 
 I am special because:
-1) The data store is looking like a tree but in fact it is a list.
-2) Not changed any thing on RecyclerView.
-3) No recursion,only cycle，so no worry about stack overflow.
-4) User will not feel any different from origin Recycler using way.
-5) Less half amount of code to other`s implemetion.
+*The data store is looking like a tree but in fact it is a list.
+*Not changed any thing on RecyclerView.
+*No recursion,only cycle，so no worry about stack overflow.
+*User will not feel any different from origin Recycler using way.
+*Less half amount of code to other`s implemetion.
 
-＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
 
 基于RecyclerView，自认为是当前最快的 Android tree view 的实现了！！
 
