@@ -26,9 +26,9 @@ I am special because:<br/>
 * 跟List无异，无论根节点还是子节点都对应RecyclerView中的一行。<br/>
 * 不需对RecyclerView做任何改动<br/>
 
-有诗为证：<br/>
+'有诗为证：<br/>
 远看像棵树<br/>
 近看不是树<br/>
 似树而非树<br/>
-是为牛逼树<br/>
+是为牛逼树<br/>'
 
