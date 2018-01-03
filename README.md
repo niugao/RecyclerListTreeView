@@ -6,8 +6,8 @@ I am special because:<br/>
 * The data store is looking like a tree but in fact it is a list.<br/>
 * Not changed any thing on RecyclerView.<br/>
 * No recursion,only cycle，so no worry about stack overflow.<br/>
-* User will not feel any different from origin Recycler using way.<br/>
-* Less half amount of code to other's implemetion.<br/>
+* User will not feel any different from using way of origin Recycler.<br/>
+* Less half amount of code than other's implemetion.<br/>
 
 ---
 
