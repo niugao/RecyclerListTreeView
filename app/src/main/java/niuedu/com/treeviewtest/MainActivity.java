@@ -3,8 +3,6 @@ package niuedu.com.treeviewtest;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -12,13 +10,15 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.niuedu.ListTree;
 
-public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class MainActivity extends AppCompatActivity
+        implements PopupMenu.OnMenuItemClickListener {
 
+    //保存数据的集合
     private ListTree tree=new ListTree();
+    //从ListTreeAdapter派生的Adapter
     ExampleListTreeAdapter adapter;
 
     @Override
@@ -28,15 +28,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
+        //使用Android原生的RecyclerView即可
         RecyclerView listView = findViewById(R.id.listview);
 
         //创建后台数据：一棵树
@@ -50,8 +42,7 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
         //第二层
         ExampleListTreeAdapter.ContactInfo contact;
         Bitmap bitmap= BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
-        contact = new ExampleListTreeAdapter.ContactInfo(
-                bitmap,"王二","[在线]我是王二");
+        contact = new ExampleListTreeAdapter.ContactInfo(bitmap,"王二","[在线]我是王二");
         ListTree.TreeNode contactNode1=tree.addNode(groupNode2,contact,R.layout.contacts_contact_item);
         ListTree.TreeNode contactNode2=tree.addNode(groupNode5,contact,R.layout.contacts_contact_item);
         //再添加一个
@@ -106,7 +97,10 @@ public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuI
             case R.id.action_add_item:
                 //向当前行增加一个儿子
                 ListTree.TreeNode node = adapter.getCurrentNode();
-                ListTree.TreeNode childNode = tree.addNode(node,"New Node", R.layout.contacts_group_item);
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+                ExampleListTreeAdapter.ContactInfo contact=new ExampleListTreeAdapter.ContactInfo(
+                        bitmap,"New contact","[离线]我没有状态");
+                ListTree.TreeNode childNode = tree.addNode(node,contact,R.layout.contacts_contact_item);
                 adapter.notifyTreeItemInserted(node,childNode);
                 return true;
             default:
