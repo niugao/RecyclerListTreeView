@@ -132,4 +132,19 @@ public abstract class ListTreeAdapter<VH extends ListTreeViewHolder>
     final public int getItemCount() {
         return tree.size();
     }
+
+    public void notifyTreeItemInserted(ListTree.TreeNode parent, ListTree.TreeNode node){
+        int parentPlaneIndex = tree.getNodePlaneIndex(parent);
+        if(parent.isExpand()) {
+            //已展开
+            super.notifyItemInserted(tree.getNodePlaneIndex(node));
+        }else{
+            //未展开，需展开爸爸
+            int count = tree.expandNode(parentPlaneIndex);
+            //通知改变爸爸的状态
+            super.notifyItemChanged(parentPlaneIndex);
+            //通知更新展开的子孙行们
+            notifyItemRangeInserted(parentPlaneIndex + 1, parent.getDescendantCount());
+        }
+    }
 }

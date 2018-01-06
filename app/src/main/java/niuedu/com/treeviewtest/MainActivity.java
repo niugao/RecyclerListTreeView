@@ -7,20 +7,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.niuedu.ListTree;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     private ListTree tree=new ListTree();
+    ExampleListTreeAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         n=tree.addNode(contactNode1,contact,R.layout.contacts_contact_item);
         n.setShowExpandIcon(false);
 
-        ExampleListTreeAdapter adapter=new ExampleListTreeAdapter(tree);
+        adapter=new ExampleListTreeAdapter(tree,this);
         listView.setLayoutManager(new LinearLayoutManager(this));
         listView.setAdapter(adapter);
     }
@@ -86,16 +85,32 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }else if(id == R.id.action_del_selected){
+            //删除选中的Nodes，删一个Node时会将其子孙一起删掉
+            tree.removeCheckedNodes();
+            adapter.notifyDataSetChanged();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item){
+        switch (item.getItemId()) {
+            case R.id.action_add_item:
+                //向当前行增加一个儿子
+                ListTree.TreeNode node = adapter.getCurrentNode();
+                ListTree.TreeNode childNode = tree.addNode(node,"New Node", R.layout.contacts_group_item);
+                adapter.notifyTreeItemInserted(node,childNode);
+                return true;
+            default:
+                return false;
+        }
     }
 }

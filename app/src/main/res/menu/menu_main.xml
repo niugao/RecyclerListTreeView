@@ -7,4 +7,7 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_del_selected"
+        android:title="删除选中" />
 </menu>

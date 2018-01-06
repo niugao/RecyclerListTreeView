@@ -1,7 +1,9 @@
 package niuedu.com.treeviewtest;
 
 import android.graphics.Bitmap;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -17,6 +19,12 @@ import com.niuedu.ListTreeViewHolder;
  */
 public class ExampleListTreeAdapter extends
         ListTreeAdapter<ExampleListTreeAdapter.BaseViewHolder> {
+
+    //行上弹出菜单的侦听器
+    private PopupMenu.OnMenuItemClickListener itemMenuClickListener;
+    //记录弹出菜单是在哪个行上出现的
+    private ListTree.TreeNode currentNode;
+
     //保存子行信息的类
     public static class ContactInfo{
         //头像,用于设置给ImageView。
@@ -46,8 +54,14 @@ public class ExampleListTreeAdapter extends
     }
 
     //构造方法
-    public ExampleListTreeAdapter(ListTree tree){
+    public ExampleListTreeAdapter(ListTree tree,
+                                  PopupMenu.OnMenuItemClickListener listener){
         super(tree);
+        this.itemMenuClickListener=listener;
+    }
+
+    public ListTree.TreeNode getCurrentNode() {
+        return currentNode;
     }
 
     @Override
@@ -87,6 +101,7 @@ public class ExampleListTreeAdapter extends
             gvh.aSwitch.setChecked(node.isChecked());
 
             gvh.aSwitch.setTag(node);
+            gvh.textViewMenu.setTag(node);
         }else if(node.getLayoutResId() == R.layout.contacts_contact_item){
             //child node
             ContactInfo info = (ContactInfo) node.getData();
@@ -101,6 +116,7 @@ public class ExampleListTreeAdapter extends
         }
     }
 
+    //组行和联系人行的Holder基类
     class BaseViewHolder extends ListTreeViewHolder{
         public BaseViewHolder(View itemView) {
             super(itemView);
@@ -109,18 +125,21 @@ public class ExampleListTreeAdapter extends
 
     //将ViewHolder声明为Adapter的内部类，反正外面也用不到
     class GroupViewHolder extends BaseViewHolder {
+
         TextView textViewTitle;
         TextView textViewCount;
         Switch aSwitch;
+        TextView textViewMenu;
+
         public GroupViewHolder(View itemView) {
             super(itemView);
 
             textViewTitle = itemView.findViewById(R.id.textViewTitle);
             textViewCount = itemView.findViewById(R.id.textViewCount);
             aSwitch = itemView.findViewById(R.id.switchChecked);
+            textViewMenu = itemView.findViewById(R.id.textViewMenu);
 
             //应响应点击事件而不是CheckedChange事件，因为那样会引起事件的递归触发
-            Switch aSwitch = itemView.findViewById(R.id.switchChecked);
             aSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -132,12 +151,20 @@ public class ExampleListTreeAdapter extends
                     notifyItemRangeChanged(planeIndex,count+1);
                 }
             });
-//        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-//
-//            }
-//        });
+
+            //点了PopMenu控件，弹出PopMenu
+            textViewMenu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ListTree.TreeNode node = (ListTree.TreeNode) v.getTag();
+                    currentNode=node;
+                    PopupMenu popup = new PopupMenu(v.getContext(), v);
+                    popup.setOnMenuItemClickListener(itemMenuClickListener);
+                    MenuInflater inflater = popup.getMenuInflater();
+                    inflater.inflate(R.menu.menu_item, popup.getMenu());
+                    popup.show();
+                }
+            });
         }
     }
 
@@ -156,7 +183,6 @@ public class ExampleListTreeAdapter extends
             aSwitch = itemView.findViewById(R.id.switchChecked);
 
             //应响应点击事件而不是CheckedChange事件，因为那样会引起事件的递归触发
-            Switch aSwitch = itemView.findViewById(R.id.switchChecked);
             aSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -168,7 +194,6 @@ public class ExampleListTreeAdapter extends
                     notifyItemRangeChanged(planeIndex,count+1);
                 }
             });
-
         }
     }
 }
