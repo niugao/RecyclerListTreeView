@@ -34,6 +34,15 @@ I am special because:<br/>
 
 ---
 
+## Useage
+
+Gradle : compile 'com.niuedu:recyclerlisttreeview:0.1.0'
+
+## Reference
+[CSDN:最快的Android TreeView出现了！](http://blog.csdn.net/nkmnkm/article/details/78985540)
+
+---
+
 ## License
 
    Copyright 2017 niugao.
