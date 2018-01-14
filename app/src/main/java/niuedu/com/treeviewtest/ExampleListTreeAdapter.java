@@ -66,23 +66,22 @@ public class ExampleListTreeAdapter extends
 
     @Override
     protected BaseViewHolder onCreateNodeView(ViewGroup parent, int viewType){
-        View view = null;
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        BaseViewHolder vh;
+
         //创建不同的行View
         if(viewType==R.layout.contacts_group_item){
-            //最后一个参数必须传true
-            view = inflater.inflate(viewType,parent,true);
-            vh=new GroupViewHolder(view);
+            //注意！此处有一个不同！最后一个参数必须传true！
+            View view = inflater.inflate(viewType,parent,true);
+            //用不同的ViewHolder包装
+            return new GroupViewHolder(view);
         }else if(viewType == R.layout.contacts_contact_item){
-            view = inflater.inflate(viewType,parent,true);
-            vh=new ContactViewHolder(view);
+            //注意！此处有一个不同！最后一个参数必须传true！
+            View view = inflater.inflate(viewType,parent,true);
+            //用不同的ViewHolder包装
+            return  new ContactViewHolder(view);
         }else{
             return null;
         }
-
-        return vh;
-
     }
 
     @Override
