@@ -2,7 +2,6 @@ package com.niuedu;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * Created by nkm on 27/12/2017.
@@ -168,6 +167,14 @@ public class ListTree {
         parent.childrenCount++;
 
         return node;
+    }
+
+    /**
+     * Get the origin collection which contains the nodes
+     * @return List
+     */
+    public List<TreeNode> getNodeList(){
+        return this.nodes;
     }
 
     /**
