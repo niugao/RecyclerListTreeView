@@ -71,6 +71,10 @@ public class ListTree {
             return ret;
         }
 
+        public TreeNode getParent() {
+            return parent;
+        }
+
         public void setExpand(boolean expand) {
             this.expand = expand;
         }
