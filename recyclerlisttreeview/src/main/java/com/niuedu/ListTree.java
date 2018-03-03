@@ -45,7 +45,7 @@ public class ListTree {
 
         //当此节点折叠时，其子孙们不能再位于List中，所以移到这里来保存。
         //当此节点展开时，再移到List中
-        private List<TreeNode> collapseDescendant = new ArrayList<>();
+        private List<TreeNode> collapseDescendant;
         private boolean expand;
         private int layerLevel;
 
@@ -126,6 +126,21 @@ public class ListTree {
         }
     }
 
+    /**
+     * 用于遍历，代表遍历的位置
+     */
+    public class EnumPos{
+        //节点在底层List中的位置
+        private int listPos;
+        //如果节点是收起的，保存节点在collapseDescendant中的位置
+        //如果是展开的，则为无意义，为-1；
+        private int descendantPos;
+
+        public EnumPos(int listPos, int descendantPos) {
+            this.listPos = listPos;
+            this.descendantPos = descendantPos;
+        }
+    }
     private int rootNodesCount;
 
     //用List保存整棵树
@@ -161,9 +176,11 @@ public class ListTree {
                 ancestor.descendantCount++;
                 ancestor = ancestor.parent;
             }
-
         } else {
             //如果parent当前状态是收起的
+            if(parent.collapseDescendant==null){
+                parent.collapseDescendant=new ArrayList<>();
+            }
             parent.collapseDescendant.add(node);
         }
 
@@ -173,18 +190,79 @@ public class ListTree {
         return node;
     }
 
+//    /**
+//     * Get a List witch conatins all items;
+//     * @return List
+//     */
+//    public List<TreeNode> getNodeList(){
+//        //如果有节点处于收起状态，底层是List中就不能包含所有的Item
+//        //
+//        return this.nodes;
+//    }
+
     /**
-     * Get the origin collection which contains the nodes
-     * @return List
+     * 开始遍历
+     * 如果返回不为null，则可以继续调用getNextNode()进行遍历。
+     * 遍历顺序并不一定符合树的遍历顺序。
+     * @return 根上第一个node的位置，如果为null，则不能继续调用getNextNode()
      */
-    public List<TreeNode> getNodeList(){
-        return this.nodes;
+    public EnumPos startEnumNode(){
+        if(nodes.isEmpty()){
+            return null;
+        }
+
+        EnumPos enumPos=new EnumPos(0,-1);
+        return enumPos;
     }
 
     /**
-     * @param parent      爸爸
-     * @param position    属于爸爸的第几子
-     * @param data        包含的用户数据
+     * 用于遍历，获取下一个节点
+     * @param pos 当前节点的位置
+     * @return 返回紧靠curNode的下一个节点的位置，紧靠谁由物理存储策略决定，返回null需停止遍历
+     */
+    public EnumPos getNextNode(EnumPos pos){
+        TreeNode node = nodes.get(pos.listPos);
+        if(pos.descendantPos<0) {
+            if (node.collapseDescendant != null) {
+                //返回当前Node的第一个儿子
+                return new EnumPos(pos.listPos, 0);
+            }else if(pos.listPos<nodes.size()-1){
+                //指向下一个
+                return new EnumPos(++pos.listPos,-1);
+            }else{
+                //后面没有了
+                return null;
+            }
+        }else{
+            if(pos.descendantPos < node.collapseDescendant.size()-1){
+                //返回当前Node的第n个儿子
+                return new EnumPos(pos.listPos,++pos.descendantPos);
+            }else if(pos.listPos < nodes.size()-1){
+                return new EnumPos(++pos.listPos,-1);
+            }else{
+                //后面没有了
+                return null;
+            }
+        }
+    }
+
+    /**
+     * 获取当前遍历到的节点
+     * @param pos 节点序号
+     * @return 节点对象，必不为null
+     */
+    public TreeNode getNodeByEnumPos(EnumPos pos){
+        TreeNode node = nodes.get(pos.listPos);
+        if(pos.descendantPos<0) {
+            return node;
+        }
+        return node.collapseDescendant.get(pos.descendantPos);
+    }
+
+    /**
+     * @param parent 爸爸
+     * @param position 属于爸爸的第几子
+     * @param data 包含的用户数据
      * @param layoutResId layout资原id
      * @return 刚添加的node
      */
@@ -220,12 +298,13 @@ public class ListTree {
                 ancestor = ancestor.parent;
             }
         } else {
+            if(parent.collapseDescendant==null){
+                parent.collapseDescendant=new ArrayList<>();
+            }
             parent.collapseDescendant.add(position, node);
         }
-
         //add children count
         parent.childrenCount++;
-
         return node;
     }
 

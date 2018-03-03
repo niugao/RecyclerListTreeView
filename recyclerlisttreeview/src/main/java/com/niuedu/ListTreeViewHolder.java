@@ -5,7 +5,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Space;
-import android.widget.TextView;
 
 /**
  * Created by nkm on 30/12/2017.
