@@ -2,6 +2,7 @@ package com.niuedu;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * Created by nkm on 27/12/2017.
@@ -128,19 +129,28 @@ public class ListTree {
 
     /**
      * 用于遍历，代表遍历的位置
+     * 注意，在树遍历过程中切不可改变树结构！！！！！！！！！！！！！！
      */
-    public class EnumPos{
-        //节点在底层List中的位置
-        private int listPos;
-        //如果节点是收起的，保存节点在collapseDescendant中的位置
-        //如果是展开的，则为无意义，为-1；
-        private int descendantPos;
+    public class EnumPos {
+        private class TreeEnumInfo {
+            //当前的Node List，因为收起的Node的儿子或儿孙也是位于一个List中的
+            private List<TreeNode> nodeList;
+            //当前nodeList上的第几个
+            private int planeIndex;
 
-        public EnumPos(int listPos, int descendantPos) {
-            this.listPos = listPos;
-            this.descendantPos = descendantPos;
+            public TreeEnumInfo(List<TreeNode> nodeList, int planeIndex) {
+                this.nodeList = nodeList;
+                this.planeIndex = planeIndex;
+            }
+        }
+
+        private Stack<TreeEnumInfo> treeEnumStack = new Stack<>();
+
+        private EnumPos() {
+            treeEnumStack.push(new TreeEnumInfo(nodes, 0));
         }
     }
+
     private int rootNodesCount;
 
     //用List保存整棵树
@@ -178,8 +188,8 @@ public class ListTree {
             }
         } else {
             //如果parent当前状态是收起的
-            if(parent.collapseDescendant==null){
-                parent.collapseDescendant=new ArrayList<>();
+            if (parent.collapseDescendant == null) {
+                parent.collapseDescendant = new ArrayList<>();
             }
             parent.collapseDescendant.add(node);
         }
@@ -204,65 +214,59 @@ public class ListTree {
      * 开始遍历
      * 如果返回不为null，则可以继续调用getNextNode()进行遍历。
      * 遍历顺序并不一定符合树的遍历顺序。
+     *
      * @return 根上第一个node的位置，如果为null，则不能继续调用getNextNode()
      */
-    public EnumPos startEnumNode(){
-        if(nodes.isEmpty()){
+    public EnumPos startEnumNode() {
+        if (nodes.isEmpty()) {
             return null;
         }
 
-        EnumPos enumPos=new EnumPos(0,-1);
-        return enumPos;
+        return new EnumPos();
     }
 
     /**
      * 用于遍历，获取下一个节点
-     * @param pos 当前节点的位置
-     * @return 返回紧靠curNode的下一个节点的位置，紧靠谁由物理存储策略决定，返回null需停止遍历
+     * 注意！！返回的与参数其实是一个对象！
+     * @param pos 当前节点的位置，既是输入参数也是输出参数
+     * @return 返回的其实是改变了内部属性的参数pos，当返回为null时，需停止遍历
      */
-    public EnumPos getNextNode(EnumPos pos){
-        TreeNode node = nodes.get(pos.listPos);
-        if(pos.descendantPos<0) {
-            if (node.collapseDescendant != null) {
-                //返回当前Node的第一个儿子
-                return new EnumPos(pos.listPos, 0);
-            }else if(pos.listPos<nodes.size()-1){
-                //指向下一个
-                return new EnumPos(++pos.listPos,-1);
-            }else{
-                //后面没有了
-                return null;
-            }
-        }else{
-            if(pos.descendantPos < node.collapseDescendant.size()-1){
-                //返回当前Node的第n个儿子
-                return new EnumPos(pos.listPos,++pos.descendantPos);
-            }else if(pos.listPos < nodes.size()-1){
-                return new EnumPos(++pos.listPos,-1);
-            }else{
-                //后面没有了
-                return null;
+    public EnumPos enumNext(EnumPos pos) {
+        EnumPos.TreeEnumInfo info = pos.treeEnumStack.peek();
+        TreeNode curNode = info.nodeList.get(info.planeIndex);
+        if (curNode.getChildrenCount() > 0 && !curNode.isExpand()) {
+            //如果这个Node没展开且有儿子，则需要遍历它的儿子
+            pos.treeEnumStack.push(pos.new TreeEnumInfo(curNode.collapseDescendant, 0));
+            return pos;
+        }
+        //如果有儿子且展开了，planeIndex+1，或者没有孩子
+        while (!pos.treeEnumStack.empty()) {
+            pos.treeEnumStack.peek().planeIndex++;
+            if (pos.treeEnumStack.peek().planeIndex == pos.treeEnumStack.peek().nodeList.size()) {
+                //如果是当前List的最后一个了，则弹出
+                pos.treeEnumStack.pop();
+            } else {
+                return pos;
             }
         }
+        return null;
     }
 
     /**
      * 获取当前遍历到的节点
+     *
      * @param pos 节点序号
      * @return 节点对象，必不为null
      */
-    public TreeNode getNodeByEnumPos(EnumPos pos){
-        TreeNode node = nodes.get(pos.listPos);
-        if(pos.descendantPos<0) {
-            return node;
-        }
-        return node.collapseDescendant.get(pos.descendantPos);
+    public TreeNode getNodeByEnumPos(EnumPos pos) {
+        TreeNode node = pos.treeEnumStack.peek().nodeList.get(pos.treeEnumStack.peek().planeIndex);
+        return node;
     }
 
     /**
-     * @param parent 爸爸
-     * @param position 属于爸爸的第几子
-     * @param data 包含的用户数据
+     * @param parent      爸爸
+     * @param position    属于爸爸的第几子
+     * @param data        包含的用户数据
      * @param layoutResId layout资原id
      * @return 刚添加的node
      */
@@ -298,8 +302,8 @@ public class ListTree {
                 ancestor = ancestor.parent;
             }
         } else {
-            if(parent.collapseDescendant==null){
-                parent.collapseDescendant=new ArrayList<>();
+            if (parent.collapseDescendant == null) {
+                parent.collapseDescendant = new ArrayList<>();
             }
             parent.collapseDescendant.add(position, node);
         }
@@ -349,7 +353,7 @@ public class ListTree {
      */
     public void removeNode(TreeNode node) {
         TreeNode parent = node.parent;
-        if (parent.isExpand()) {
+        if (parent==null || parent.isExpand()) {
             int descendantCount = node.descendantCount;
             int index = nodes.indexOf(node);
             List ret = nodes.subList(index, index + descendantCount + 1);
@@ -387,8 +391,8 @@ public class ListTree {
         return nodes.indexOf(node);
     }
 
-    public int expandNode(int nodePlaneIndex) {
-        TreeNode node = nodes.get(nodePlaneIndex);
+    public int expandNode(TreeNode node) {
+        int nodePlaneIndex=nodes.indexOf(node);
 
         if (node.isExpand()) {
             throw new IllegalStateException("Only invoke when parent is collesped");
@@ -403,7 +407,7 @@ public class ListTree {
         //如果有儿子，把儿子们移到List中
         List<TreeNode> descendant = node.extractDescendant();
         nodes.addAll(nodePlaneIndex + 1, descendant);
-        node.descendantCount=descendant.size();
+        node.descendantCount = descendant.size();
 
         //需追溯它所有的长辈，为每个都更新其子孙数量
         TreeNode ancestor = node.parent;
@@ -415,9 +419,14 @@ public class ListTree {
         return node.descendantCount;
     }
 
-    //返回影响到的Node们的数量
-    public int collapseNode(int nodePlaneIndex) {
+    public int expandNode(int nodePlaneIndex) {
         TreeNode node = nodes.get(nodePlaneIndex);
+        return expandNode(node);
+    }
+
+    //返回影响到的Node们的数量
+    public int collapseNode(TreeNode node) {
+        int nodePlaneIndex = nodes.indexOf(node);
         if (!node.isExpand()) {
             throw new IllegalStateException("Only invoke when parent is expand");
         }
@@ -444,6 +453,10 @@ public class ListTree {
         }
 
         return node.descendantCount;
+    }
+    public int collapseNode(int nodePlaneIndex) {
+        TreeNode node = nodes.get(nodePlaneIndex);
+        return collapseNode(node);
     }
 
     public int setDescendantChecked(int nodePlaneIndex, boolean b) {

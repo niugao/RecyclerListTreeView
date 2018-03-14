@@ -12,15 +12,16 @@ import static org.junit.Assert.assertEquals;
  * Example local unit test, which will execute on the development machine (host).
  */
 public class ListTreeTest {
-    private ListTree tree=new ListTree();
-    ListTree.TreeNode groupNode1;
-    ListTree.TreeNode groupNode2;
-    ListTree.TreeNode groupNode3;
-    ListTree.TreeNode groupNode4;
-    ListTree.TreeNode groupNode5;
+    private ListTree tree;
+    private ListTree.TreeNode groupNode1;
+    private ListTree.TreeNode groupNode2;
+    private ListTree.TreeNode groupNode3;
+    private ListTree.TreeNode groupNode4;
+    private ListTree.TreeNode groupNode5;
 
     @Before
     public void setUp(){
+        this.tree=new ListTree();
         groupNode1=tree.addNode(null,"root 1",0);
         groupNode2=tree.addNode(null,"root 2",0);
         groupNode3=tree.addNode(null,"root 3",0);
@@ -44,23 +45,63 @@ public class ListTreeTest {
     }
 
     @Test
-    public void testAddNodes(){
+    public void testExpandNodes(){
         assertEquals(tree.getNodePlaneIndex(groupNode1),0);
         assertEquals(tree.getNodePlaneIndex(groupNode5),4);
-        tree.expandNode(tree.getNodePlaneIndex(groupNode2));
+        tree.expandNode(groupNode2);
         assertEquals(tree.getNodePlaneIndex(groupNode5),6);
+        tree.collapseNode(groupNode2);
     }
-    
+
+    @Test
+    public void testInsertNodes(){
+        ListTree.TreeNode node = tree.insertNode(groupNode2,0,"2-3",-1);
+        assertEquals(tree.getNodePlaneIndex(groupNode3),2);
+        tree.expandNode(groupNode2);
+        assertEquals(tree.getNodePlaneIndex(groupNode3),5);
+    }
+
+    @Test
     public void testEnumTree(){
         ListTree.EnumPos pos = tree.startEnumNode();
-        int c=0;
+        int count=0;
         while (pos!=null){
-            c++;
+            count++;
             ListTree.TreeNode node = tree.getNodeByEnumPos(pos);
-            System.out.println(node.getData().toString());
-            pos=tree.getNextNode(pos);
+            //System.out.println(node.getData().toString());
+            pos = tree.enumNext(pos);
         }
 
-        assertEquals(c,11);
+        assertEquals(count,11);
+    }
+
+    @Test
+    public void testRemoveOneNode(){
+        this.tree.removeNode(groupNode3);
+
+        ListTree.EnumPos pos = tree.startEnumNode();
+        int count=0;
+        while (pos!=null){
+            count++;
+            ListTree.TreeNode node = tree.getNodeByEnumPos(pos);
+            //System.out.println(node.getData().toString());
+            pos = tree.enumNext(pos);
+        }
+        assertEquals(count,10);
+    }
+
+    @Test
+    public void testRemoveNodes(){
+        this.tree.removeNode(groupNode2);
+
+        ListTree.EnumPos pos = tree.startEnumNode();
+        int count=0;
+        while (pos!=null){
+            count++;
+            ListTree.TreeNode node = tree.getNodeByEnumPos(pos);
+            System.out.println(node.getData().toString());
+            pos = tree.enumNext(pos);
+        }
+        assertEquals(count,6);
     }
 }
