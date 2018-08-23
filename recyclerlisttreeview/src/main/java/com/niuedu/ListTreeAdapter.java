@@ -2,17 +2,19 @@ package com.niuedu;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Space;
 
 import niuedu.com.R;
 
 /**
  * 为RecyclerView提供数据
  */
-public abstract class ListTreeAdapter<VH extends ListTreeViewHolder>
+public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHolder>
         extends RecyclerView.Adapter<VH> {
 
     protected ListTree tree;
@@ -55,37 +57,19 @@ public abstract class ListTreeAdapter<VH extends ListTreeViewHolder>
         int w= parent.getMeasuredWidth();
         arrowIcon.getLayoutParams().width=w/15;
         arrowIcon.getLayoutParams().height=w/15;
-        arrowIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ListTree.TreeNode node = (ListTree.TreeNode) v.getTag();
-                if(node.isShowExpandIcon()) {
-                    int nodePlaneIndex = tree.getNodePlaneIndex(node);
-                    if (node.isExpand()) {
-                        //收起
-                        int count = tree.collapseNode(nodePlaneIndex);
-                        notifyItemChanged(nodePlaneIndex);
-                        //通知view将相关的行删掉
-                        notifyItemRangeRemoved(nodePlaneIndex + 1, count);
-                    } else {
-                        //展开
-                        int count = tree.expandNode(nodePlaneIndex);
-                        notifyItemChanged(nodePlaneIndex);
-                        //通知view插入相关的行
-                        notifyItemRangeInserted(nodePlaneIndex + 1, count);
-                    }
-                }
-            }
-        });
 
         //子类创建自己的row view
         VH vh = onCreateNodeView(container,viewType);
         if(vh==null){
             return null;
         }
+
         vh.containerView = container;
         vh.arrowIcon=arrowIcon;
         vh.headSpace=container.findViewById(R.id.listtree_head_space);
+
+        //不能在构造方法中设置各View，只能另搞一个方法了
+        vh.initView();
 
         //container.addView(vh.itemView);
         return vh;
@@ -116,8 +100,6 @@ public abstract class ListTreeAdapter<VH extends ListTreeViewHolder>
             holder.arrowIcon.setImageBitmap(null);
         }
 
-        holder.arrowIcon.setTag(node);
-
         //跟据node的层深，改变缩进距离,从0开始计
         int layer = tree.getNodeLayerLevel(node);
         holder.headSpace.getLayoutParams().width=layer*20;
@@ -144,6 +126,43 @@ public abstract class ListTreeAdapter<VH extends ListTreeViewHolder>
             super.notifyItemChanged(parentPlaneIndex);
             //通知更新展开的子孙行们
             notifyItemRangeInserted(parentPlaneIndex + 1, parent.getDescendantCount());
+        }
+    }
+
+    public class ListTreeViewHolder extends RecyclerView.ViewHolder{
+        protected ViewGroup containerView;
+        protected ImageView arrowIcon;
+        protected Space headSpace;
+
+        public ListTreeViewHolder(View itemView) {
+            super(itemView);
+            //由于构造方法在子类中调用，不能在这里搞View了，转到initView()中了。
+        }
+
+        protected void initView() {
+            arrowIcon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int planePos = getAdapterPosition();
+                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(planePos);
+                    if(node.isShowExpandIcon()) {
+                        int nodePlaneIndex = tree.getNodePlaneIndex(node);
+                        if (node.isExpand()) {
+                            //收起
+                            int count = tree.collapseNode(nodePlaneIndex);
+                            notifyItemChanged(nodePlaneIndex);
+                            //通知view将相关的行删掉
+                            notifyItemRangeRemoved(nodePlaneIndex + 1, count);
+                        } else {
+                            //展开
+                            int count = tree.expandNode(nodePlaneIndex);
+                            notifyItemChanged(nodePlaneIndex);
+                            //通知view插入相关的行
+                            notifyItemRangeInserted(nodePlaneIndex + 1, count);
+                        }
+                    }
+                }
+            });
         }
     }
 }

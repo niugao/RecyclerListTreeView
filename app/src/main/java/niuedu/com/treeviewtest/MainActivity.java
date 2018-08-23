@@ -8,6 +8,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -79,9 +80,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }else if(id == R.id.action_del_selected){
+        if(id == R.id.action_del_selected){
             //删除选中的Nodes，删一个Node时会将其子孙一起删掉
             tree.removeCheckedNodes();
             adapter.notifyDataSetChanged();
@@ -91,6 +90,7 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    //响应某个Node上的快捷菜单的选择事件
     @Override
     public boolean onMenuItemClick(MenuItem item){
         switch (item.getItemId()) {
@@ -102,6 +102,12 @@ public class MainActivity extends AppCompatActivity
                         bitmap,"New contact","[离线]我没有状态");
                 ListTree.TreeNode childNode = tree.addNode(node,contact,R.layout.contacts_contact_item);
                 adapter.notifyTreeItemInserted(node,childNode);
+                return true;
+            case R.id.action_clear_children:
+                //清空所有的儿子们
+                node = adapter.getCurrentNode();
+                Pair<Integer,Integer> range = tree.clearDescendant(node);
+                adapter.notifyItemRangeRemoved(range.first,range.second);
                 return true;
             default:
                 return false;

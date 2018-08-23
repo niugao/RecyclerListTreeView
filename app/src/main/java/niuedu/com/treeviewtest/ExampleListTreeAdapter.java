@@ -12,7 +12,6 @@ import android.widget.TextView;
 
 import com.niuedu.ListTree;
 import com.niuedu.ListTreeAdapter;
-import com.niuedu.ListTreeViewHolder;
 
 /**
  * 为RecyclerView提供数据
@@ -98,9 +97,6 @@ public class ExampleListTreeAdapter extends
             gvh.textViewTitle.setText(title);
             gvh.textViewCount.setText("0/"+node.getChildrenCount());
             gvh.aSwitch.setChecked(node.isChecked());
-
-            gvh.aSwitch.setTag(node);
-            gvh.textViewMenu.setTag(node);
         }else if(node.getLayoutResId() == R.layout.contacts_contact_item){
             //child node
             ContactInfo info = (ContactInfo) node.getData();
@@ -110,13 +106,11 @@ public class ExampleListTreeAdapter extends
             cvh.textViewTitle.setText(info.getTitle());
             cvh.textViewDetail.setText(info.getDetail());
             cvh.aSwitch.setChecked(node.isChecked());
-
-            cvh.aSwitch.setTag(node);
         }
     }
 
     //组行和联系人行的Holder基类
-    class BaseViewHolder extends ListTreeViewHolder{
+    class BaseViewHolder extends ListTreeAdapter.ListTreeViewHolder{
         public BaseViewHolder(View itemView) {
             super(itemView);
         }
@@ -142,9 +136,9 @@ public class ExampleListTreeAdapter extends
             aSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ListTree.TreeNode node = (ListTree.TreeNode) view.getTag();
+                    int planeIndex = getAdapterPosition();
+                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(planeIndex);
                     node.setChecked(!node.isChecked());
-                    int planeIndex = tree.getNodePlaneIndex(node);
                     //改变所有的子孙们的状态
                     int count =tree.setDescendantChecked(planeIndex,node.isChecked());
                     notifyItemRangeChanged(planeIndex,count+1);
@@ -155,7 +149,8 @@ public class ExampleListTreeAdapter extends
             textViewMenu.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ListTree.TreeNode node = (ListTree.TreeNode) v.getTag();
+                    int nodePlaneIndex = getAdapterPosition();
+                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(nodePlaneIndex);
                     currentNode=node;
                     PopupMenu popup = new PopupMenu(v.getContext(), v);
                     popup.setOnMenuItemClickListener(itemMenuClickListener);
@@ -185,12 +180,12 @@ public class ExampleListTreeAdapter extends
             aSwitch.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ListTree.TreeNode node = (ListTree.TreeNode) view.getTag();
+                    int nodePlaneIndex = getAdapterPosition();
+                    ListTree.TreeNode node = tree.getNodeByPlaneIndex(nodePlaneIndex);
                     node.setChecked(!node.isChecked());
-                    int planeIndex = tree.getNodePlaneIndex(node);
                     //改变所有的子孙们的状态
-                    int count =tree.setDescendantChecked(planeIndex,node.isChecked());
-                    notifyItemRangeChanged(planeIndex,count+1);
+                    int count =tree.setDescendantChecked(nodePlaneIndex,node.isChecked());
+                    notifyItemRangeChanged(nodePlaneIndex,count+1);
                 }
             });
         }

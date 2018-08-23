@@ -1,5 +1,8 @@
 package com.niuedu;
 
+import android.util.Pair;
+import android.util.Range;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -23,7 +26,6 @@ import java.util.Stack;
  * 是为牛逼树
  */
 public class ListTree {
-
     public class TreeNode {
         //实际的数据
         private Object data;
@@ -109,6 +111,10 @@ public class ListTree {
         }
 
         public void setDescendantChecked(boolean b) {
+            if(this.collapseDescendant==null){
+                return;
+            }
+
             if (this.expand) {
                 throw new IllegalStateException("Only can invoke when node is collapsed");
             }
@@ -346,6 +352,29 @@ public class ListTree {
         return -1;
     }
 
+    //返回被删除了Item的start plane index和count
+    public Pair<Integer,Integer> clearDescendant(TreeNode treeNode) {
+        if (treeNode.childrenCount == 0) {
+            //如果没有儿子，无法收起
+            return null;
+        }
+
+        //如果有儿子，把子孙们从List中取出来
+        int nodePlaneIndex = nodes.indexOf(treeNode);
+        Pair<Integer,Integer> ret = new Pair<Integer,Integer>(
+                nodePlaneIndex+1, treeNode.descendantCount);
+        List<TreeNode> descendant = nodes.subList(
+                nodePlaneIndex + 1,
+                nodePlaneIndex + 1 + treeNode.descendantCount);
+        descendant.clear();
+
+        treeNode.childrenCount=0;
+        treeNode.descendantCount=0;
+        treeNode.collapseDescendant=null;
+
+        return ret;
+    }
+
     /**
      * remove node and its descendant
      *
@@ -495,8 +524,7 @@ public class ListTree {
         for (int i = 0; i < nodes.size(); i++) {
             TreeNode node = nodes.get(i);
             if (node.isChecked()) {
-                List<TreeNode> descendant = nodes.subList(
-                        i, i + 1 + node.descendantCount);
+                List<TreeNode> descendant = nodes.subList(i, i + 1 + node.descendantCount);
                 nodeToDel.addAll(descendant);
 
                 //更新其爸爸的儿子数，更新其父辈的子孙数
