@@ -2,8 +2,8 @@ group = PROJ_GROUP
 version = PROJ_VERSION
 project.archivesBaseName = PROJ_ARTIFACTID
 
+apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
-apply plugin: 'com.github.dcendents.android-maven'
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -14,6 +14,7 @@ task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += configurations.compile
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    options.encoding = "UTF-8"
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {

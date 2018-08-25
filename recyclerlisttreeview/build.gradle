@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
     compileSdkVersion 27
@@ -6,7 +7,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
-        versionName '0.1.3'
+        versionName '0.1.4'
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -31,4 +32,15 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:27.+'
 }
 
-apply from: '../bintray.gradle'
+//apply from: '../bintray.gradle'
+
+publish {
+    userOrg = 'niuedu'
+    groupId = 'com.niuedu'
+    artifactId = 'recyclerlisttreeview'
+    publishVersion = '0.1.4'
+    desc = 'Fastest Android Tree View lib bases on RecyclerView'
+    website = 'https://github.com/niugao/RecyclerListTreeView'
+    bintrayUser = 'niugao'
+    bintrayKey = '987f1a844cd2dcca041ece51ea20f3ad19fdaf69'
+}
