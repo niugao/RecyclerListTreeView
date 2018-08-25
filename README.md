@@ -1,6 +1,6 @@
 # RecyclerListTreeView
 
-`The fastest android Tree View based on RecyclerView in the world!!`
+`The fastest android Tree View bases on RecyclerView in the world!!`
 
 I am special because:<br/>
 * The data store is looking like a tree but in fact it is a list.<br/>
@@ -36,7 +36,7 @@ I am special because:<br/>
 
 ## Useage
 
-Gradle : compile 'com.niuedu:recyclerlisttreeview:0.1.0'
+Gradle : compile 'com.niuedu:recyclerlisttreeview:0.1.4'
 
 ## Reference
 [CSDN:最快的Android TreeView出现了！](http://blog.csdn.net/nkmnkm/article/details/78985540)
