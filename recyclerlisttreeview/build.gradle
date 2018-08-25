@@ -44,3 +44,6 @@ publish {
     bintrayUser = 'niugao'
     bintrayKey = '987f1a844cd2dcca041ece51ea20f3ad19fdaf69'
 }
+
+//Cammand to upload lib to bintray is:
+//gradlew clean build bintrayUpload
