@@ -11,7 +11,7 @@ I am special because:<br/>
 
 ---
 
-`基于RecyclerView，自认为是当前最快的 Android tree view 的实现了！！`
+`基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`
 
 存储数据的结构并不是Tree，而是一个ArrayList。与所有已知的网上的实现都不一样，大家似乎都跳不出固定思维。
 可以比较一下代码量，此实现比其它的少一半都不止。

@@ -3,10 +3,10 @@ apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 27
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 27
         versionCode 1
         versionName '0.1.4'
 
@@ -19,18 +19,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '27.0.3'
     productFlavors {
     }
 }
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:28.+'
+    implementation 'com.android.support:appcompat-v7:27.+'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
-    implementation 'com.android.support:recyclerview-v7:28.+'
+    implementation 'com.android.support:recyclerview-v7:27.+'
 }
 
 //apply from: '../bintray.gradle'
@@ -38,7 +38,7 @@ dependencies {
 publish {
     userOrg = 'niugao'
     repoName = 'NiuEduAndroidLib'
-    groupId = 'com.niuedu'
+    groupId = 'com.edu'
     artifactId = 'recyclerlisttreeview'
     publishVersion = '0.1.4'
     desc = 'Fastest Android Tree View lib bases on RecyclerView'
