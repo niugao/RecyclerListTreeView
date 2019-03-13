@@ -1,1 +1,1 @@
-include ':app', ':recyclerlisttreeview'
+include ':app', ':recyclerlisttreeview', ':app4cotlin'
