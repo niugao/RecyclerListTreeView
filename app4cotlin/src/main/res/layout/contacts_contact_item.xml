@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:paddingBottom="4dp"
+    android:paddingTop="4dp">
+
+    <ImageView
+        android:id="@+id/imageViewHead"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="10dp"
+        app:srcCompat="@drawable/contacts_focus" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/textViewDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Detail"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/switchChecked"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
