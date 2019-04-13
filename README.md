@@ -76,7 +76,7 @@ limitations under the License.
 ### 创建ListTree实例，向其中添加每行的数据（一行是一个节点）。每个节点是一个ListTree.TreeNode实例。要在行中显示不同的数据，需要自定义不同的Model类，通过TreeNode.getData()获取Model实例，并进行类型转换转成实际的类型。
 ### 从ListTreeAdapter派生自己的Adpater,重写其onCreateNodeView()和onBindNodeViewHolder()方法，实现方式与RecyclerView.Adpater中相应的方法无异。注意viewType被我定死了，即那一行的layout资源ID。
 ### 在ListTree中已提供了Check一行的支持，如果要实现，需要你自己在行layout中添加对应的控件（比如Switch或ToggleButton）并与TreeNode的Check状态关联。
-### 拖荐Android入门好书：《Android9编程通俗演义》－清华大学出版社，京东淘宝及各大书店有售！
+### 推荐Android入门好书：《Android9编程通俗演义》－清华大学出版社，京东淘宝及各大书店有售！
 
 
 
