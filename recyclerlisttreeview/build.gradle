@@ -44,7 +44,7 @@ publish {
     repoName = 'NiuEduAndroidLib'
     groupId = 'com.edu'
     artifactId = 'recyclerlisttreeview'
-    publishVersion = '0.1.5'
+    publishVersion = '0.1.6'
     desc = 'Fastest Android Tree View lib bases on RecyclerView'
     website = 'https://github.com/niugao/RecyclerListTreeView'
     bintrayUser = 'niugao'
