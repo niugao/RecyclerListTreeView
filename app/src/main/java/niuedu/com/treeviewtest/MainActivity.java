@@ -44,8 +44,12 @@ public class MainActivity extends AppCompatActivity
         ExampleListTreeAdapter.ContactInfo contact;
         Bitmap bitmap= BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
         contact = new ExampleListTreeAdapter.ContactInfo(bitmap,"王二","[在线]我是王二");
-        ListTree.TreeNode contactNode1=tree.addNode(groupNode2,contact,R.layout.contacts_contact_item);
-        ListTree.TreeNode contactNode2=tree.addNode(groupNode5,contact,R.layout.contacts_contact_item);
+        ListTree.TreeNode contactNode1 = tree.addNode(groupNode1,contact,R.layout.contacts_contact_item);
+        tree.addNode(groupNode1,contact,R.layout.contacts_contact_item);
+        //再添加一个
+        contact = new ExampleListTreeAdapter.ContactInfo(bitmap,"王二","[在线]我是王二");
+        ListTree.TreeNode contactNode2=tree.addNode(groupNode2,contact,R.layout.contacts_contact_item);
+        ListTree.TreeNode contactNode3=tree.addNode(groupNode5,contact,R.layout.contacts_contact_item);
         //再添加一个
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
         contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"王三","[离线]我没有状态");
@@ -59,8 +63,13 @@ public class MainActivity extends AppCompatActivity
         n.setShowExpandIcon(false);
         //再添加一个
         bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
+        contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"东邪","[离线]出来还价");
+        n=tree.addNode(contactNode2,contact,R.layout.contacts_contact_item);
+        n.setShowExpandIcon(false);
+        //再添加一个
+        bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.contacts_normal);
         contact=new ExampleListTreeAdapter.ContactInfo(bitmap,"李圆圆","[离线]昨天出门没出去");
-        n=tree.addNode(contactNode1,contact,R.layout.contacts_contact_item);
+        n=tree.addNode(contactNode2,contact,R.layout.contacts_contact_item);
         n.setShowExpandIcon(false);
 
         adapter=new ExampleListTreeAdapter(tree,this);

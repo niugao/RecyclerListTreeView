@@ -481,7 +481,9 @@ public class ListTree {
             ancestor = ancestor.parent;
         }
 
-        return node.descendantCount;
+        int ret = node.descendantCount;
+        node.descendantCount = 0;
+        return ret;
     }
     public int collapseNode(int nodePlaneIndex) {
         TreeNode node = nodes.get(nodePlaneIndex);
@@ -524,6 +526,7 @@ public class ListTree {
         for (int i = 0; i < nodes.size(); i++) {
             TreeNode node = nodes.get(i);
             if (node.isChecked()) {
+                //如果是收起状态
                 List<TreeNode> descendant = nodes.subList(i, i + 1 + node.descendantCount);
                 nodeToDel.addAll(descendant);
 
