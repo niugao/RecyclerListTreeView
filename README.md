@@ -11,7 +11,7 @@ I am special because:<br/>
 
 ---
 update:
-reycyclerlisttreeview 更新到 0.1.5 主要更新了Android SDK版本和Gradle版本
+reycyclerlisttreeview 更新到 0.1.6 主要更新了Android SDK版本和Gradle版本
 增加了Kotlin版的测试App模块
 ---
 
