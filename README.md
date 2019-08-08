@@ -11,11 +11,14 @@ I am special because:<br/>
 
 ---
 update:
-0.1.5:
+### 0.1.5:
 主要更新了Android SDK版本和Gradle版本.
+
 增加了Kotlin版的测试App模块.
-0.1.6:
+### 0.1.6:
+
 修正的了一个bug.
+
 ---
 
 `基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`
@@ -43,7 +46,7 @@ update:
 
 ## Useage
 
-Gradle : compile 'com.niuedu:recyclerlisttreeview:0.1.4'
+Gradle : implementation 'com.niuedu:recyclerlisttreeview:0.1.6'
 
 ## Reference
 [CSDN:最快的Android TreeView出现了！](http://blog.csdn.net/nkmnkm/article/details/78985540)
