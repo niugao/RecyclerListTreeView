@@ -23,8 +23,8 @@ class ExampleListTreeAdapter(tree: ListTree, listener : PopupMenu.OnMenuItemClic
     //保存子行信息的类
     class ContactInfo(
             val bitmap: Bitmap, //头像,用于设置给ImageView
-            val title: String, //标题
-            val detail: String //描述
+            var title: String, //标题
+            var detail: String //描述
     )
 
     init{

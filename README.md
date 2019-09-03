@@ -11,8 +11,20 @@ I am special because:<br/>
 
 ---
 update:
-reycyclerlisttreeview 更新到 0.1.5 主要更新了Android SDK版本和Gradle版本
-增加了Kotlin版的测试App模块
+### 0.1.5:
+主要更新了Android SDK版本和Gradle版本.
+
+增加了Kotlin版的测试App模块.
+### 0.1.6:
+修正的了一个bug：如果四五个顶级父类，当第一个顶级父类处于展开的情况下，删除最后一个顶级父类，程序会崩溃。
+
+### 0.1.7:
+- 改变了很多方法的访问性质，提高了封装性；
+- 更新了Grable插件版本；
+- 添加了新的方法：枚举所有的节点；
+- 添加了新的方法：展开全部Node与收起全部Node；
+- 修正bug：当一个node收起时，如果其子Node被选中，无法删除这个子node；
+
 ---
 
 `基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`
@@ -40,7 +52,7 @@ reycyclerlisttreeview 更新到 0.1.5 主要更新了Android SDK版本和Gradle�
 
 ## Useage
 
-Gradle : compile 'com.niuedu:recyclerlisttreeview:0.1.4'
+Gradle : implementation 'com.niuedu:recyclerlisttreeview:0.1.6'
 
 ## Reference
 [CSDN:最快的Android TreeView出现了！](http://blog.csdn.net/nkmnkm/article/details/78985540)

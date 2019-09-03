@@ -50,7 +50,6 @@ public class ListTree {
         //当此节点展开时，再移到List中
         private List<TreeNode> collapseDescendant;
         private boolean expand;
-        private int layerLevel;
 
         private TreeNode(TreeNode parent, Object data, int layoutResId) {
             this.parent = parent;
@@ -59,7 +58,7 @@ public class ListTree {
         }
 
         //把子孙们收回
-        public void retractDescendant(List<TreeNode> collapseChildren) {
+        void retractDescendant(List<TreeNode> collapseChildren) {
             //Must clone a array
             this.collapseDescendant = new ArrayList<>();
             for (TreeNode node : collapseChildren) {
@@ -68,7 +67,7 @@ public class ListTree {
         }
 
         //把子孙们抽走
-        public List<TreeNode> extractDescendant() {
+        List<TreeNode> extractDescendant() {
             List<TreeNode> ret = this.collapseDescendant;
             this.collapseDescendant = null;
             return ret;
@@ -78,7 +77,7 @@ public class ListTree {
             return parent;
         }
 
-        public void setExpand(boolean expand) {
+        void setExpand(boolean expand) {
             this.expand = expand;
         }
 
@@ -110,13 +109,13 @@ public class ListTree {
             this.checked = checked;
         }
 
-        public void setDescendantChecked(boolean b) {
-            if(this.collapseDescendant==null){
+        void setDescendantChecked(boolean b) {
+            if (this.collapseDescendant == null) {
                 return;
             }
 
             if (this.expand) {
-                throw new IllegalStateException("Only can invoke when node is collapsed");
+                throw new IllegalStateException("Only can be invoked when node is collapsed");
             }
 
             for (TreeNode node : this.collapseDescendant) {
@@ -130,6 +129,40 @@ public class ListTree {
 
         public int getDescendantCount() {
             return descendantCount;
+        }
+
+        //仅在处于收起状态时才被调用
+        void enumCheckedNodes(EnumOptionFunc optFunc) {
+            if (this.expand) {
+                throw new IllegalStateException("Only can be invoked when node is collapsed");
+            }
+
+            if(this.collapseDescendant == null){
+                return ;
+            }
+
+            for (TreeNode node : this.collapseDescendant) {
+                optFunc.option(node);
+                if (!node.isExpand()) {
+                    node.enumCheckedNodes(optFunc);
+                }
+            }
+        }
+
+        void removeCheckedChildren() {
+            if(this.collapseDescendant == null) {
+                return;
+            }
+
+            for(int i=0;i<this.collapseDescendant.size();i++){
+                if(this.collapseDescendant.get(i).checked){
+                    this.collapseDescendant.remove(i);
+                    i--;
+                }else{
+                    //如果没有被check，要查看起孩子是否被check
+                    this.collapseDescendant.get(i).removeCheckedChildren();
+                }
+            }
         }
     }
 
@@ -234,6 +267,7 @@ public class ListTree {
     /**
      * 用于遍历，获取下一个节点
      * 注意！！返回的与参数其实是一个对象！
+     *
      * @param pos 当前节点的位置，既是输入参数也是输出参数
      * @return 返回的其实是改变了内部属性的参数pos，当返回为null时，需停止遍历
      */
@@ -353,7 +387,7 @@ public class ListTree {
     }
 
     //返回被删除了Item的start plane index和count
-    public Pair<Integer,Integer> clearDescendant(TreeNode treeNode) {
+    public Pair<Integer, Integer> clearDescendant(TreeNode treeNode) {
         if (treeNode.childrenCount == 0) {
             //如果没有儿子，无法收起
             return null;
@@ -361,16 +395,16 @@ public class ListTree {
 
         //如果有儿子，把子孙们从List中取出来
         int nodePlaneIndex = nodes.indexOf(treeNode);
-        Pair<Integer,Integer> ret = new Pair<Integer,Integer>(
-                nodePlaneIndex+1, treeNode.descendantCount);
+        Pair<Integer, Integer> ret = new Pair<Integer, Integer>(
+                nodePlaneIndex + 1, treeNode.descendantCount);
         List<TreeNode> descendant = nodes.subList(
                 nodePlaneIndex + 1,
                 nodePlaneIndex + 1 + treeNode.descendantCount);
         descendant.clear();
 
-        treeNode.childrenCount=0;
-        treeNode.descendantCount=0;
-        treeNode.collapseDescendant=null;
+        treeNode.childrenCount = 0;
+        treeNode.descendantCount = 0;
+        treeNode.collapseDescendant = null;
 
         return ret;
     }
@@ -382,7 +416,7 @@ public class ListTree {
      */
     public void removeNode(TreeNode node) {
         TreeNode parent = node.parent;
-        if (parent==null || parent.isExpand()) {
+        if (parent == null || parent.isExpand()) {
             int descendantCount = node.descendantCount;
             int index = nodes.indexOf(node);
             List ret = nodes.subList(index, index + descendantCount + 1);
@@ -421,7 +455,7 @@ public class ListTree {
     }
 
     public int expandNode(TreeNode node) {
-        int nodePlaneIndex=nodes.indexOf(node);
+        int nodePlaneIndex = nodes.indexOf(node);
 
         if (node.isExpand()) {
             throw new IllegalStateException("Only invoke when parent is collesped");
@@ -466,7 +500,7 @@ public class ListTree {
             return 0;
         }
 
-        //如果有儿子，把子孙们从List中取出自己保存
+        //如果有子孙，把子孙们从List中取出来自己保存
         List<TreeNode> descendant = nodes.subList(
                 nodePlaneIndex + 1, nodePlaneIndex + 1 + node.descendantCount);
 
@@ -485,6 +519,7 @@ public class ListTree {
         node.descendantCount = 0;
         return ret;
     }
+
     public int collapseNode(int nodePlaneIndex) {
         TreeNode node = nodes.get(nodePlaneIndex);
         return collapseNode(node);
@@ -526,9 +561,11 @@ public class ListTree {
         for (int i = 0; i < nodes.size(); i++) {
             TreeNode node = nodes.get(i);
             if (node.isChecked()) {
-                //如果是收起状态
-                List<TreeNode> descendant = nodes.subList(i, i + 1 + node.descendantCount);
-                nodeToDel.addAll(descendant);
+                //注意不用判断一个Node是否为展开状态，直接这样删是没问题的，
+                // 因为未展开时descendantCount为0
+                List<TreeNode> it_and_descendant = nodes.subList(i, i + 1 + node.descendantCount);
+                nodes.removeAll(it_and_descendant);
+                //nodeToDel.addAll(it_and_descendant);
 
                 //更新其爸爸的儿子数，更新其父辈的子孙数
                 TreeNode ancestor = node.parent;
@@ -540,11 +577,45 @@ public class ListTree {
                     ancestor.descendantCount -= node.descendantCount + 1;
                     ancestor = ancestor.parent;
                 }
-
-                i += node.descendantCount;
+                i--;
+            } else {
+                //如果这个Node没被选中，但是还要查看起孩子是否被选中
+                node.removeCheckedChildren();
             }
         }
+    }
 
-        nodes.removeAll(nodeToDel);
+    @FunctionalInterface
+    public interface EnumOptionFunc {
+        void option(TreeNode node);
+    }
+
+    //使用此方法，可以改变node对各种属性，但切不可
+    public void enumCheckedNodes(EnumOptionFunc optFunc) {
+        //如果是展开的，继续遍历
+        //如果是收起的，应遍历它自己所保存的子孙们
+        for (int i = 0; i < nodes.size(); i++) {
+            TreeNode node = nodes.get(i);
+            if (node.isChecked()) {
+                optFunc.option(node);
+                if (!node.isExpand()) {
+                    node.enumCheckedNodes(optFunc);
+                }
+            }
+        }
+    }
+
+    public void expandAllNodes() {
+        for (int i = 0; i < nodes.size(); i++) {
+            TreeNode node = nodes.get(i);
+            expandNode(node);
+        }
+    }
+
+    public void collapseAllNodes() {
+        for (int i = 0; i < nodes.size(); i++) {
+            TreeNode node = nodes.get(i);
+            collapseNode(node);
+        }
     }
 }

@@ -39,15 +39,16 @@ class MainActivity : AppCompatActivity() , PopupMenu.OnMenuItemClickListener{
         val groupNode5 = tree.addNode(null, "同学", R.layout.contacts_group_item)
 
         //第二层
-        var contact: ExampleListTreeAdapter.ContactInfo
         var bitmap = BitmapFactory.decodeResource(resources, R.drawable.contacts_normal)
-        contact = ExampleListTreeAdapter.ContactInfo(bitmap, "王二", "[在线]我是王二")
+        var contact = ExampleListTreeAdapter.ContactInfo(bitmap, "王二", "[在线]我是王二")
         val contactNode1 = tree.addNode(groupNode2, contact, R.layout.contacts_contact_item)
+        contact = ExampleListTreeAdapter.ContactInfo(bitmap, "王三", "[在线]我是王三")
         val contactNode2 = tree.addNode(groupNode5, contact, R.layout.contacts_contact_item)
         //再添加一个
         bitmap = BitmapFactory.decodeResource(resources, R.drawable.contacts_normal)
-        contact = ExampleListTreeAdapter.ContactInfo(bitmap, "王三", "[离线]我没有状态")
+        contact = ExampleListTreeAdapter.ContactInfo(bitmap, "王四", "[离线]我没有状态")
         tree.addNode(groupNode2, contact, R.layout.contacts_contact_item)
+        contact = ExampleListTreeAdapter.ContactInfo(bitmap, "王五", "[离线]我没有状态")
         tree.addNode(groupNode5, contact, R.layout.contacts_contact_item)
 
         //第三层
@@ -82,9 +83,33 @@ class MainActivity : AppCompatActivity() , PopupMenu.OnMenuItemClickListener{
             tree.removeCheckedNodes()
             adapter?.notifyDataSetChanged()
             return true
+        } else if(id == R.id.action_expand_all) {
+            //展开所有的node
+            tree.expandAllNodes();
+            adapter?.let {
+                it.notifyDataSetChanged()
+            }
+            return true
+        }else if(id == R.id.action_collapse_all) {
+            //收起所有的node
+            tree.collapseAllNodes();
+            adapter?.let {
+                it.notifyDataSetChanged()
+            }
+            return true
+        } else if(id == R.id.action_iterate_all_checked) {
+            tree.enumCheckedNodes{
+                (it.data as ExampleListTreeAdapter.ContactInfo).let{
+                    it.title = "enum "+it.title
+                }
+            }
+            adapter?.let {
+                it.notifyDataSetChanged()
+            }
+            return true
+        } else{
+            return super.onOptionsItemSelected(item)
         }
-
-        return super.onOptionsItemSelected(item)
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
