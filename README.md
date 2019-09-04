@@ -24,23 +24,22 @@ update:
 - 添加了新的方法：枚举所有的节点；
 - 添加了新的方法：展开全部Node与收起全部Node；
 - 修正bug：当一个node收起时，如果其子Node被选中，无法删除这个子node；
-- 将ListTree改为范型；
+
 ---
 
 `基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`
 
-存储数据的结构并不是Tree，而是一个ArrayList。与所有已知的网上的实现都不一样，大家似乎都跳不出固定思维。
-可以比较一下代码量，此实现比其它的少一半都不止。
-
+存储数据的结构并不是Tree，而是一个ArrayList。<br/>
+与所有已知的网上的实现都不一样，看起来大家似乎都跳不出固定思维。
+可以比较一下代码量，此实现比其它的少一半都不止.
+<br/><br/>
 核心是一个表示Tree的类，但它的本质是一个List。对RecyclerView没有任何改动，对Adapter只有少量封装，
-使用者不会产生任何陌生感。也就是说你对RecyclerView能做的，现在依然能做。
+使用者不会产生任何陌生感。也就是说你对原生RecyclerView能做的，现在依然能做。
 
 以List的形式表式树，带来很多好处：<br/>
-* 没有了递归。该用递归的地方全部变成了循环（Tree不论有多少层都没有栈溢出）。<br/>
-* 其次是有序，插入节点时，可以指定它是它爸爸的第几个儿子。<br/>
-* 极其适合在RecyclerView中使用<br/>
-* 跟List无异，无论根节点还是子节点都对应RecyclerView中的一行。<br/>
-* 不需对RecyclerView做任何改动<br/>
+* 大部分情况下，消除了递归。该用递归的地方基本都变成了循环。<br/>
+* 节点有序，插入节点时，可以指定它是它爸爸的第几个儿子。<br/>
+* 极其适合在RecyclerView中使用：与List无异，无论根节点还是子节点都对应RecyclerView中的一行，不需对RecyclerView做任何改动<br/>
 
 有诗为证：<br/>
 远看像棵树<br/>
@@ -52,7 +51,7 @@ update:
 
 ## Useage
 
-Gradle : implementation 'com.niuedu:recyclerlisttreeview:0.1.6'
+Gradle : implementation 'com.niuedu:recyclerlisttreeview:0.1.7'
 
 ## Reference
 [CSDN:最快的Android TreeView出现了！](http://blog.csdn.net/nkmnkm/article/details/78985540)

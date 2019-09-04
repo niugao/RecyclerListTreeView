@@ -32,7 +32,7 @@ class ExampleListTreeAdapter(tree: ListTree, listener : PopupMenu.OnMenuItemClic
     }
 
     override fun onCreateNodeView(parent: ViewGroup?, viewType: Int): BaseViewHolder? {
-        val inflater = LayoutInflater.from(parent!!.getContext())
+        val inflater = LayoutInflater.from(parent!!.context)
 
         //创建不同的行View
         if (viewType == R.layout.contacts_group_item) {
