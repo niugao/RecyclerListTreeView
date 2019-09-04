@@ -24,7 +24,7 @@ update:
 - 添加了新的方法：枚举所有的节点；
 - 添加了新的方法：展开全部Node与收起全部Node；
 - 修正bug：当一个node收起时，如果其子Node被选中，无法删除这个子node；
-
+- 将ListTree改为范型；
 ---
 
 `基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`

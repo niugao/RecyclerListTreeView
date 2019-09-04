@@ -13,5 +13,5 @@
         android:title="全部收起" />
     <item
         android:id="@+id/action_iterate_all_checked"
-        android:title="改变选中项的文本" />
+        android:title="改变选中项（枚举）" />
 </menu>
