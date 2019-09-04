@@ -46,10 +46,14 @@ public class ExampleListTreeAdapter extends
         public String getTitle() {
             return title;
         }
+        public void setTitle(String title) {
+            this.title = title;
+        }
 
         public String getDetail() {
             return detail;
         }
+
     }
 
     //构造方法

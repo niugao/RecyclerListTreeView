@@ -5,5 +5,13 @@
     <item
         android:id="@+id/action_del_selected"
         android:title="删除选中" />
-    <item android:title="Item" />
+    <item
+        android:id="@+id/action_expand_all"
+        android:title="全部展开" />
+    <item
+        android:id="@+id/action_collapse_all"
+        android:title="全部收起" />
+    <item
+        android:id="@+id/action_iterate_all_checked"
+        android:title="改变选中项（枚举）" />
 </menu>
