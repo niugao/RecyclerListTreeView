@@ -22,6 +22,7 @@ android {
     buildToolsVersion '28.0.3'
     productFlavors {
     }
+
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'

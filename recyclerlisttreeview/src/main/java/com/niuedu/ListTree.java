@@ -1,5 +1,6 @@
 package com.niuedu;
 
+import android.support.annotation.TransitionRes;
 import android.util.Pair;
 import android.util.Range;
 
@@ -33,10 +34,11 @@ public class ListTree {
         //本node所使用的layout id
         private int layoutResId;
 
-        //儿子们的数量，儿子们一定是紧挨着爸爸放置的
+        //儿子们的数量，儿子们是紧挨着爸爸依次放置的，
+        // 注意与descendantCount不一样，不论收起还是展开，都有效
         private int childrenCount = 0;
 
-        //其所有子孙们的数量，这个在收起必须为0,在展开时才有效
+        //其所有子孙们的数量，指的是所有在Nodes中的子孙的数量，不展开的不计，这个在收起必须为0,在展开时才有效
         private int descendantCount = 0;
 
         private TreeNode parent = null;
@@ -206,35 +208,35 @@ public class ListTree {
         TreeNode node = new TreeNode(parent, data, layoutResId);
         if (parent == null) {
             //root node,append to end
+            TreeNode prevSibling = nodes.get(nodes.size()-1);
             nodes.add(node);
             rootNodesCount++;
-            return node;
-        }
+        }else {
+            //插入非root node，有爹
+            if (parent.isExpand()) {
+                //如果parent当前状态是展开的
+                int index = nodes.indexOf(parent);
+                index += parent.descendantCount;
 
-        //插入非root node，有爹
-        if (parent.isExpand()) {
-            //如果parent当前状态是展开的
-            int index = nodes.indexOf(parent);
-            index += parent.descendantCount;
-
-            //插到最后一个子孙的后面
-            nodes.add(index + 1, node);
-            //需追溯它所有的长辈，为每个都更新其子孙数量
-            TreeNode ancestor = parent;
-            while (ancestor != null) {
-                ancestor.descendantCount++;
-                ancestor = ancestor.parent;
+                //插到最后一个子孙的后面
+                nodes.add(index + 1, node);
+                //需追溯它所有的长辈，为每个都更新其子孙数量
+                TreeNode ancestor = parent;
+                while (ancestor != null) {
+                    ancestor.descendantCount++;
+                    ancestor = ancestor.parent;
+                }
+            } else {
+                //如果parent当前状态是收起的
+                if (parent.collapseDescendant == null) {
+                    parent.collapseDescendant = new ArrayList<>();
+                }
+                parent.collapseDescendant.add(node);
             }
-        } else {
-            //如果parent当前状态是收起的
-            if (parent.collapseDescendant == null) {
-                parent.collapseDescendant = new ArrayList<>();
-            }
-            parent.collapseDescendant.add(node);
-        }
 
-        //add children count
-        parent.childrenCount++;
+            //add children count
+            parent.childrenCount++;
+        }
 
         return node;
     }
@@ -319,21 +321,75 @@ public class ListTree {
                 //插入位置超出范围
                 return null;
             }
-
-            nodes.add(position, node);
+            insertRootNode(nodes, position,node);
             rootNodesCount++;
-            return node;
+        }else {
+            //插入非root node，有爹
+            if (position > parent.childrenCount) {
+                //插入位置超出范围
+                return null;
+            }
+            insertNoRootNode(nodes,parent,position,node);
+            //add children count
+            parent.childrenCount++;
         }
 
-        //插入非root node，有爹
-        if (position > parent.childrenCount) {
-            //插入位置超出范围
-            return null;
+        return node;
+    }
+
+    /**
+     * @param position 排行第几，树角度的序号
+     * @param node
+     */
+    private void insertRootNode(List<TreeNode> nodeList,int position, TreeNode node){
+        //因为有的哥哥是展开的，所以需要遍历它们才能确定位置
+        //TreeNode prevSibling =null;
+        TreeNode nextSibling = nodeList.get(0);
+        int i=0;
+        while(i<position){
+            //prevSibling = nextSibling;
+            nextSibling = getNextSibling(nextSibling);
+            i++;
         }
 
+        if(nextSibling!=null) {
+            //找到位置了，取得此位置的node在list中的序号，这才是插入的位置
+            int index=nodeList.indexOf(nextSibling);
+            nodeList.add(index,node);
+        }else{
+            //向最后添加
+            nodeList.add(node);
+        }
+    }
+
+    /**
+     * @param position 排行第几，树角度的序号
+     * @param node
+     */
+    private void insertNoRootNode(List<TreeNode> nodeList,TreeNode parent, int position, TreeNode node){
         if (parent.isExpand()) {
-            int planePosition = getNodePlaneIndexByIndex(parent, position);
-            nodes.add(planePosition, node);
+            //如果是展开的，往nodes中插入
+            //因为有的哥哥是展开的，所以需要遍历它们才能确定位置
+            TreeNode prevSibling = null;
+            //获取第一个儿子
+            TreeNode nextSibling = nodeList.get(nodeList.indexOf(parent)+1);
+            int i=0;
+            while(i<position){
+                prevSibling = nextSibling;
+                nextSibling = getNextSibling(nextSibling);
+                i++;
+            }
+
+            //添到数组
+            if(nextSibling!=null) {
+                //找到位置了，取得此位置的node在list中的序号，这才是插入的位置
+                int index=nodeList.indexOf(nextSibling);
+                nodeList.add(index,node);
+            }else{
+                //应加到最后一个兄弟的后面，注意，可能此兄弟后面还有祖辈，所以还需要确定位置进行插入
+                int index = nodeList.indexOf(prevSibling);
+                nodeList.add(index+prevSibling.descendantCount+1,node);
+            }
 
             //需追溯它所有的长辈，为每个都更新其子孙数量
             TreeNode ancestor = parent;
@@ -342,20 +398,21 @@ public class ListTree {
                 ancestor = ancestor.parent;
             }
         } else {
+            //如果非展开，向爸爸自己的数组中插入
             if (parent.collapseDescendant == null) {
                 parent.collapseDescendant = new ArrayList<>();
             }
-            parent.collapseDescendant.add(position, node);
+
+            insertRootNode(parent.collapseDescendant,position,node);
         }
-        //add children count
-        parent.childrenCount++;
-        return node;
     }
 
     /**
      * @param parent if null , return root node
      * @param index  它是从树的角度来讲的序号
      * @return plane index,<0 means exceed range
+     *
+     * 必须计算其哥哥展开子孙的情况
      */
     private int getNodePlaneIndexByIndex(TreeNode parent, int index) {
         if (!parent.isExpand()) {
@@ -370,6 +427,7 @@ public class ListTree {
             range = parent.childrenCount;
         }
 
+        //FIXME:有bug！
         int planeIndex = 0;
 
         for (int i = 0; i < range; i++) {
@@ -453,6 +511,86 @@ public class ListTree {
     public int getNodePlaneIndex(TreeNode node) {
         return nodes.indexOf(node);
     }
+
+    //TODO:获取一个节点在其爸爸里的位置，也就是它在兄弟中排行老几
+    public int getNodeIndex(TreeNode node){
+        TreeNode parent = node.getParent();
+        if(parent!=null){
+
+        }else{
+            return nodes.indexOf(node);
+        }
+        return -1;
+    }
+
+
+    public TreeNode getNextSibling(TreeNode node){
+        //判断这个node是在nodes中还是在某个Node的collapseDescendant中
+        TreeNode parent = node.getParent();
+        while (parent!=null){
+            if(parent.descendantCount>0){
+                //在collapseDescendant中
+                int index = parent.collapseDescendant.indexOf(node);
+                TreeNode ret = parent.collapseDescendant.get(index+node.descendantCount);
+                //真的是node的弟弟吗？
+                if(ret.getParent() == node.getParent()){
+                    return ret;
+                }else{
+                    //没有弟弟了
+                    return null;
+                }
+            }
+        }
+
+        //node在nodes中
+        int index = nodes.indexOf(node);
+        TreeNode ret = nodes.get(index+node.descendantCount);
+        //真的是node的弟弟吗？
+        if(ret.getParent() == node.getParent()){
+            return ret;
+        }else{
+            //没有弟弟了
+            return null;
+        }
+    }
+
+    private static TreeNode getPrevSibling(List<TreeNode> nodeList,TreeNode node){
+        //node在nodes中
+        int index = nodeList.indexOf(node);
+
+        //如果它是老大，则没哥了
+        if(index==0){
+            return null;
+        }
+
+        //如何找它哥哥？先找它左边的node，看是不是，如果不是，必定是它的堂后辈，
+        //找这个后辈的爸爸，看它的爸爸与node是否相同
+        TreeNode prevNode = nodeList.get(index-1);
+        while(prevNode != null){
+            if(prevNode.getParent()==node.getParent()){
+                //找到了
+                return prevNode;
+            }
+            prevNode = prevNode.getParent();
+        }
+
+        return null;
+    }
+
+    public TreeNode getPrevSibling(TreeNode node){
+        //判断这个node是在nodes中还是在某个Node的collapseDescendant中
+        TreeNode parent = node.getParent();
+        while (parent!=null){
+            if(parent.descendantCount>0){
+                //在collapseDescendant中
+                return getPrevSibling(parent.collapseDescendant,node);
+            }
+        }
+
+        //node在nodes中
+        return getPrevSibling(nodes,node);
+    }
+
 
     public int expandNode(TreeNode node) {
         int nodePlaneIndex = nodes.indexOf(node);
