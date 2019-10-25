@@ -208,7 +208,6 @@ public class ListTree {
         TreeNode node = new TreeNode(parent, data, layoutResId);
         if (parent == null) {
             //root node,append to end
-            TreeNode prevSibling = nodes.get(nodes.size()-1);
             nodes.add(node);
             rootNodesCount++;
         }else {
@@ -636,7 +635,7 @@ public class ListTree {
         int nodePlaneIndex = nodes.indexOf(node);
 
         if (node.isExpand()) {
-            throw new IllegalStateException("Only invoke when parent is collesped");
+            return 0;
         }
 
         node.setExpand(true);
@@ -669,7 +668,7 @@ public class ListTree {
     public int collapseNode(TreeNode node) {
         int nodePlaneIndex = nodes.indexOf(node);
         if (!node.isExpand()) {
-            throw new IllegalStateException("Only invoke when parent is expand");
+            return 0;
         }
         node.setExpand(false);
 
