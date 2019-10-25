@@ -26,8 +26,9 @@ update:
 - 修正bug：当一个node收起时，如果其子Node被选中，无法删除这个子node；
 
 ### 0.1.8 :
-- 添加从一个节点获取其相邻的哥哥和弟弟的方法；
-- 添加获取一个节在爸爸中的排行的方法；
+- 添加从获取节点的相邻哥哥和弟弟的方法：getNextSibling(),getPrevSibling()；
+- 添加获取一个节在爸爸中的排行的方法；getNodeRankIndex();
+- 修正插入节点时的bug；
 
 ---
 
@@ -39,6 +40,10 @@ update:
 <br/><br/>
 核心是一个表示Tree的类，但它的本质是一个List。对RecyclerView没有任何改动，对Adapter只有少量封装，
 使用者不会产生任何陌生感。也就是说你对原生RecyclerView能做的，现在依然能做。
+
+<br/><br/>
+注意一个Node有两个序号，一个是Plane Index，是它在List中的绝对位置；另一个是Rank Index，是它在兄弟中的排行，也就是爸爸的第几个儿子。
+<br/><br/>
 
 以List的形式表式树，带来很多好处：<br/>
 * 大部分情况下，消除了递归。该用递归的地方基本都变成了循环。<br/>

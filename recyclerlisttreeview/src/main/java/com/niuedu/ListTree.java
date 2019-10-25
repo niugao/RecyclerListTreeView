@@ -35,11 +35,11 @@ public class ListTree {
         private int layoutResId;
 
         //儿子们的数量，儿子们是紧挨着爸爸依次放置的，
-        // 注意与descendantCount不一样，不论收起还是展开，都有效
+        // 注意与expandDescendantCount不一样，不论收起还是展开，都有效
         private int childrenCount = 0;
 
         //其所有子孙们的数量，指的是所有在Nodes中的子孙的数量，不展开的不计，这个在收起必须为0,在展开时才有效
-        private int descendantCount = 0;
+        private int expandDescendantCount = 0;
 
         private TreeNode parent = null;
 
@@ -129,8 +129,8 @@ public class ListTree {
             return childrenCount;
         }
 
-        public int getDescendantCount() {
-            return descendantCount;
+        public int getexpandDescendantCount() {
+            return expandDescendantCount;
         }
 
         //仅在处于收起状态时才被调用
@@ -216,14 +216,14 @@ public class ListTree {
             if (parent.isExpand()) {
                 //如果parent当前状态是展开的
                 int index = nodes.indexOf(parent);
-                index += parent.descendantCount;
+                index += parent.expandDescendantCount;
 
                 //插到最后一个子孙的后面
                 nodes.add(index + 1, node);
                 //需追溯它所有的长辈，为每个都更新其子孙数量
                 TreeNode ancestor = parent;
                 while (ancestor != null) {
-                    ancestor.descendantCount++;
+                    ancestor.expandDescendantCount++;
                     ancestor = ancestor.parent;
                 }
             } else {
@@ -388,13 +388,13 @@ public class ListTree {
             }else{
                 //应加到最后一个兄弟的后面，注意，可能此兄弟后面还有祖辈，所以还需要确定位置进行插入
                 int index = nodeList.indexOf(prevSibling);
-                nodeList.add(index+prevSibling.descendantCount+1,node);
+                nodeList.add(index+prevSibling.expandDescendantCount+1,node);
             }
 
             //需追溯它所有的长辈，为每个都更新其子孙数量
             TreeNode ancestor = parent;
             while (ancestor != null) {
-                ancestor.descendantCount++;
+                ancestor.expandDescendantCount++;
                 ancestor = ancestor.parent;
             }
         } else {
@@ -436,7 +436,7 @@ public class ListTree {
             } else {
                 //指向下一个root node
                 TreeNode node = nodes.get(planeIndex);
-                planeIndex += node.isExpand() ? node.descendantCount : 0;
+                planeIndex += node.isExpand() ? node.expandDescendantCount : 0;
                 planeIndex++;
             }
         }
@@ -454,14 +454,14 @@ public class ListTree {
         //如果有儿子，把子孙们从List中取出来
         int nodePlaneIndex = nodes.indexOf(treeNode);
         Pair<Integer, Integer> ret = new Pair<Integer, Integer>(
-                nodePlaneIndex + 1, treeNode.descendantCount);
+                nodePlaneIndex + 1, treeNode.expandDescendantCount);
         List<TreeNode> descendant = nodes.subList(
                 nodePlaneIndex + 1,
-                nodePlaneIndex + 1 + treeNode.descendantCount);
+                nodePlaneIndex + 1 + treeNode.expandDescendantCount);
         descendant.clear();
 
         treeNode.childrenCount = 0;
-        treeNode.descendantCount = 0;
+        treeNode.expandDescendantCount = 0;
         treeNode.collapseDescendant = null;
 
         return ret;
@@ -475,9 +475,9 @@ public class ListTree {
     public void removeNode(TreeNode node) {
         TreeNode parent = node.parent;
         if (parent == null || parent.isExpand()) {
-            int descendantCount = node.descendantCount;
+            int expandDescendantCount = node.expandDescendantCount;
             int index = nodes.indexOf(node);
-            List ret = nodes.subList(index, index + descendantCount + 1);
+            List ret = nodes.subList(index, index + expandDescendantCount + 1);
             ret.clear();//remove nodes and its descendant
 
             if (parent != null) {
@@ -486,7 +486,7 @@ public class ListTree {
                 //需追溯它所有的长辈，为每个都更新其子孙数量
                 TreeNode ancestor = parent;
                 while (ancestor != null) {
-                    ancestor.descendantCount -= descendantCount;
+                    ancestor.expandDescendantCount -= expandDescendantCount;
                     ancestor = ancestor.parent;
                 }
             } else {
@@ -497,7 +497,7 @@ public class ListTree {
                 rootNodesCount--;
             } else {
                 parent.childrenCount++;
-                parent.descendantCount--;
+                parent.expandDescendantCount--;
             }
             nodes.remove(node);
         }
@@ -508,43 +508,82 @@ public class ListTree {
         return nodes.get(index);
     }
 
+    /**
+     * 获取在nodes中的绝对位置
+     * @param node
+     * @return 如果返回－1，说明node不在树中或处于被收起状态，此时它没有Plane Index
+     */
     public int getNodePlaneIndex(TreeNode node) {
         return nodes.indexOf(node);
     }
 
-    //TODO:获取一个节点在其爸爸里的位置，也就是它在兄弟中排行老几
-    public int getNodeIndex(TreeNode node){
+    //获取一个节点在其爸爸里的位置，也就是它在兄弟中排行老几
+    public int getNodeRankIndex(TreeNode node){
+        List<TreeNode> nodeList = getNodeContainer(node);
         TreeNode parent = node.getParent();
-        if(parent!=null){
 
+        //看其爸爸是否也在同一个List中
+        if (parent!=null){
+            int index = nodeList.indexOf(parent);
+            if(index >= 0){
+                //爸爸在这个list里面，爸爸后面就是第一个儿子
+                TreeNode node1 = nodeList.get(index+1);
+                int i=0;
+                //比较各儿子是否与node相同
+                while (node1 != null && node1!=node){
+                    node1=getNextSibling(nodeList,node1);
+                    i++;
+                }
+                if(node1!=null){
+                    return i;
+                }else {
+                    //没有找到这个儿子，不可能！
+                    throw new RuntimeException("Can`t find node in tree");
+                }
+            }else{
+                //爸爸不在这个list里面，那这个list就是爸爸的（1）
+            }
         }else{
-            return nodes.indexOf(node);
+            //说明是root Node，与（1）处处理方式相同
         }
-        return -1;
+
+        //node是nodeList中的root node
+        TreeNode node1 = nodeList.get(0);
+        int i=0;
+        //比较各儿子是否与node相同
+        while (node1 != null && node1!=node){
+            node1=getNextSibling(nodeList,node1);
+            i++;
+        }
+
+        if(node1==null){
+            //没有找到这个儿子，不可能！
+            throw new RuntimeException("Can`t find node in tree");
+        }else{
+            return i;
+        }
     }
 
-
-    public TreeNode getNextSibling(TreeNode node){
-        //判断这个node是在nodes中还是在某个Node的collapseDescendant中
+    //判断一个node在nodes中，还是在某个节点的collapseDescendant中
+    private List<TreeNode> getNodeContainer(TreeNode node){
         TreeNode parent = node.getParent();
         while (parent!=null){
-            if(parent.descendantCount>0){
-                //在collapseDescendant中
-                int index = parent.collapseDescendant.indexOf(node);
-                TreeNode ret = parent.collapseDescendant.get(index+node.descendantCount);
-                //真的是node的弟弟吗？
-                if(ret.getParent() == node.getParent()){
-                    return ret;
-                }else{
-                    //没有弟弟了
-                    return null;
-                }
+            if(parent.expandDescendantCount==0){
+                //说明收起了，在collapseDescendant中
+                return parent.collapseDescendant;
             }
         }
 
-        //node在nodes中
-        int index = nodes.indexOf(node);
-        TreeNode ret = nodes.get(index+node.descendantCount);
+        //到这里说明在nodes中
+        return nodes;
+    }
+
+    public TreeNode getNextSibling(TreeNode node){
+        //判断这个node是在nodes中还是在某个Node的collapseDescendant中
+        List<TreeNode> nodeList = getNodeContainer(node);
+
+        int index = nodeList.indexOf(node);
+        TreeNode ret = nodeList.get(index+node.expandDescendantCount);
         //真的是node的弟弟吗？
         if(ret.getParent() == node.getParent()){
             return ret;
@@ -554,7 +593,22 @@ public class ListTree {
         }
     }
 
-    private static TreeNode getPrevSibling(List<TreeNode> nodeList,TreeNode node){
+    //为了避免多次调用getNodeContainer而提供专用于内部的
+    private TreeNode getNextSibling(List<TreeNode> nodeList, TreeNode node){
+        int index = nodeList.indexOf(node);
+        TreeNode ret = nodeList.get(index+node.expandDescendantCount);
+        //真的是node的弟弟吗？
+        if(ret.getParent() == node.getParent()){
+            return ret;
+        }else{
+            //没有弟弟了
+            return null;
+        }
+    }
+
+    public TreeNode getPrevSibling(TreeNode node){
+        //判断这个node是在nodes中还是在某个Node的collapseDescendant中
+        List<TreeNode> nodeList = getNodeContainer(node);
         //node在nodes中
         int index = nodeList.indexOf(node);
 
@@ -577,20 +631,6 @@ public class ListTree {
         return null;
     }
 
-    public TreeNode getPrevSibling(TreeNode node){
-        //判断这个node是在nodes中还是在某个Node的collapseDescendant中
-        TreeNode parent = node.getParent();
-        while (parent!=null){
-            if(parent.descendantCount>0){
-                //在collapseDescendant中
-                return getPrevSibling(parent.collapseDescendant,node);
-            }
-        }
-
-        //node在nodes中
-        return getPrevSibling(nodes,node);
-    }
-
 
     public int expandNode(TreeNode node) {
         int nodePlaneIndex = nodes.indexOf(node);
@@ -608,16 +648,16 @@ public class ListTree {
         //如果有儿子，把儿子们移到List中
         List<TreeNode> descendant = node.extractDescendant();
         nodes.addAll(nodePlaneIndex + 1, descendant);
-        node.descendantCount = descendant.size();
+        node.expandDescendantCount = descendant.size();
 
         //需追溯它所有的长辈，为每个都更新其子孙数量
         TreeNode ancestor = node.parent;
         while (ancestor != null) {
-            ancestor.descendantCount += node.descendantCount;
+            ancestor.expandDescendantCount += node.expandDescendantCount;
             ancestor = ancestor.parent;
         }
 
-        return node.descendantCount;
+        return node.expandDescendantCount;
     }
 
     public int expandNode(int nodePlaneIndex) {
@@ -640,7 +680,7 @@ public class ListTree {
 
         //如果有子孙，把子孙们从List中取出来自己保存
         List<TreeNode> descendant = nodes.subList(
-                nodePlaneIndex + 1, nodePlaneIndex + 1 + node.descendantCount);
+                nodePlaneIndex + 1, nodePlaneIndex + 1 + node.expandDescendantCount);
 
         node.retractDescendant((List<TreeNode>) descendant);
         //在List中删掉这一段
@@ -649,12 +689,12 @@ public class ListTree {
         //需追溯它所有的长辈，为每个都更新其子孙数量
         TreeNode ancestor = node.parent;
         while (ancestor != null) {
-            ancestor.descendantCount -= node.descendantCount;
+            ancestor.expandDescendantCount -= node.expandDescendantCount;
             ancestor = ancestor.parent;
         }
 
-        int ret = node.descendantCount;
-        node.descendantCount = 0;
+        int ret = node.expandDescendantCount;
+        node.expandDescendantCount = 0;
         return ret;
     }
 
@@ -667,11 +707,11 @@ public class ListTree {
         TreeNode node = nodes.get(nodePlaneIndex);
         if (node.isExpand()) {
             int start = nodePlaneIndex + 1;
-            int count = node.descendantCount;
+            int count = node.expandDescendantCount;
             for (int i = start; i < start + count; i++) {
                 nodes.get(i).setChecked(b);
             }
-            return node.descendantCount;
+            return node.expandDescendantCount;
         } else {
             node.setDescendantChecked(b);
             return 0;
@@ -700,8 +740,8 @@ public class ListTree {
             TreeNode node = nodes.get(i);
             if (node.isChecked()) {
                 //注意不用判断一个Node是否为展开状态，直接这样删是没问题的，
-                // 因为未展开时descendantCount为0
-                List<TreeNode> it_and_descendant = nodes.subList(i, i + 1 + node.descendantCount);
+                // 因为未展开时expandDescendantCount为0
+                List<TreeNode> it_and_descendant = nodes.subList(i, i + 1 + node.expandDescendantCount);
                 nodes.removeAll(it_and_descendant);
                 //nodeToDel.addAll(it_and_descendant);
 
@@ -712,7 +752,7 @@ public class ListTree {
                 }
 
                 while (ancestor != null) {
-                    ancestor.descendantCount -= node.descendantCount + 1;
+                    ancestor.expandDescendantCount -= node.expandDescendantCount + 1;
                     ancestor = ancestor.parent;
                 }
                 i--;
