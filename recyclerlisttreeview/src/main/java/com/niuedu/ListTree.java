@@ -4,6 +4,8 @@ import android.support.annotation.TransitionRes;
 import android.util.Pair;
 import android.util.Range;
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -172,6 +174,7 @@ public class ListTree {
      * 用于遍历，代表遍历的位置
      * 注意，在树遍历过程中切不可改变树结构！！！！！！！！！！！！！！
      */
+    @Deprecated
     public class EnumPos {
         private class TreeEnumInfo {
             //当前的Node List，因为收起的Node的儿子或儿孙也是位于一个List中的
@@ -201,7 +204,7 @@ public class ListTree {
     /**
      * @param parent      其父node，若添加root node，则父node传null即可
      * @param data        node中所包含的用户数据
-     * @param layoutResId node的行layout资源id
+     * @param layoutResId node的Item layout资源id
      * @return 刚添加的node
      */
     public TreeNode addNode(TreeNode parent, Object data, int layoutResId) {
@@ -257,6 +260,7 @@ public class ListTree {
      *
      * @return 根上第一个node的位置，如果为null，则不能继续调用getNextNode()
      */
+    @Deprecated
     public EnumPos startEnumNode() {
         if (nodes.isEmpty()) {
             return null;
@@ -272,6 +276,7 @@ public class ListTree {
      * @param pos 当前节点的位置，既是输入参数也是输出参数
      * @return 返回的其实是改变了内部属性的参数pos，当返回为null时，需停止遍历
      */
+    @Deprecated
     public EnumPos enumNext(EnumPos pos) {
         EnumPos.TreeEnumInfo info = pos.treeEnumStack.peek();
         TreeNode curNode = info.nodeList.get(info.planeIndex);
@@ -299,6 +304,7 @@ public class ListTree {
      * @param pos 节点序号
      * @return 节点对象，必不为null
      */
+    @Deprecated
     public TreeNode getNodeByEnumPos(EnumPos pos) {
         TreeNode node = pos.treeEnumStack.peek().nodeList.get(pos.treeEnumStack.peek().planeIndex);
         return node;
@@ -767,6 +773,7 @@ public class ListTree {
         void option(TreeNode node);
     }
 
+    @Deprecated
     //使用此方法，可以改变node对各种属性，但切不可
     public void enumCheckedNodes(EnumOptionFunc optFunc) {
         //如果是展开的，继续遍历
@@ -795,4 +802,70 @@ public class ListTree {
             collapseNode(node);
         }
     }
+
+    public void printList(){
+        for(TreeNode node : nodes){
+            //看看自己在哪一层
+            int level = getNodeLayerLevel(node);
+
+            StringBuilder sb = new StringBuilder();
+            for(int i=0;i<level;i++){
+                sb.append('\t');
+            }
+
+            System.out.println(sb.toString()+node.getData().toString());
+        }
+    }
+
+    public void printTree(){
+        for(TreeNode node : nodes){
+            //看看自己在哪一层
+            int level = getNodeLayerLevel(node);
+
+            StringBuilder sb = new StringBuilder();
+            for(int i=0;i<level;i++){
+                sb.append('\t');
+            }
+
+            System.out.println(sb.toString()+node.getData().toString());
+        }
+    }
+
+    private class Couple {
+        List<TreeNode> list;
+        int curListPos;
+
+        public Couple(List<TreeNode> list, int curListPos) {
+            this.list = list;
+            this.curListPos = curListPos;
+        }
+    }
+
+    /**
+     * 对整个树进行遍历，可以替代enumCheckedNodes方法，只需要对Node的isChecked判断即可
+     * @param optFunc
+     */
+    public void forEach(EnumOptionFunc optFunc){
+        //以树的形式顺序遍历所有节点
+
+        //顶端是当前正在搞的List
+        Stack<Couple> listStack = new Stack<>();
+        listStack.push(new Couple(nodes,0));
+
+        do {
+            if(listStack.peek().list.size()>listStack.peek().curListPos) {
+                TreeNode node = listStack.peek().list.get(listStack.peek().curListPos);
+                optFunc.option(node);
+                listStack.peek().curListPos++;
+
+                if (node.collapseDescendant != null && !node.collapseDescendant.isEmpty()) {
+                    //如果不为空，搞这list
+                    listStack.push(new Couple(node.collapseDescendant, 0));
+                }
+            }else {
+                listStack.pop();
+            }
+        }while(!listStack.empty());
+    }
+
 }
