@@ -27,9 +27,10 @@ update:
 
 ### 0.1.8 :
 - 添加从获取节点的相邻哥哥和弟弟的方法：getNextSibling(),getPrevSibling()；
-- 添加获取一个节在爸爸中的排行的方法；getNodeRankIndex();
+- 添加获取一个node在兄弟中排行的方法：getNodeRank();
 - 修正插入节点时的bug；
-- 添加了遍历整棵树的方法forEach()，可以代替enumCheckedNodes()方法，去除了唯一一处涉及递归操作的地方；
+- 添加了遍历整棵树的方法forEach()，可以代替enumCheckedNodes()方法，从而去除了唯一一处涉及递归操作的地方；
+- 添加了单元测试；
 ---
 
 `基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`

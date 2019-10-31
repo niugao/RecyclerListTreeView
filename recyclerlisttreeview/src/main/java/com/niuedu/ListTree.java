@@ -29,6 +29,8 @@ import java.util.Stack;
  * 是为牛逼树
  */
 public class ListTree {
+
+
     public class TreeNode {
         //实际的数据
         private Object data;
@@ -523,7 +525,7 @@ public class ListTree {
     }
 
     //获取一个节点在其爸爸里的位置，也就是它在兄弟中排行老几
-    public int getNodeRankIndex(TreeNode node){
+    public int getNodeRank(TreeNode node){
         List<TreeNode> nodeList = getNodeContainer(node);
         TreeNode parent = node.getParent();
 
@@ -587,20 +589,24 @@ public class ListTree {
         //判断这个node是在nodes中还是在某个Node的collapseDescendant中
         List<TreeNode> nodeList = getNodeContainer(node);
 
-        int index = nodeList.indexOf(node);
-        TreeNode ret = nodeList.get(index+node.expandDescendantCount);
-        //真的是node的弟弟吗？
-        if(ret.getParent() == node.getParent()){
-            return ret;
-        }else{
-            //没有弟弟了
+        int index = nodeList.indexOf(node)+1;
+        if(nodeList.size()==index){
             return null;
+        }else {
+            TreeNode ret = nodeList.get(index + node.expandDescendantCount);
+            //真的是node的弟弟吗？
+            if (ret.getParent() == node.getParent()) {
+                return ret;
+            } else {
+                //没有弟弟了
+                return null;
+            }
         }
     }
 
     //为了避免多次调用getNodeContainer而提供专用于内部的
     private TreeNode getNextSibling(List<TreeNode> nodeList, TreeNode node){
-        int index = nodeList.indexOf(node);
+        int index = nodeList.indexOf(node)+1;
         TreeNode ret = nodeList.get(index+node.expandDescendantCount);
         //真的是node的弟弟吗？
         if(ret.getParent() == node.getParent()){
@@ -817,20 +823,6 @@ public class ListTree {
         }
     }
 
-    public void printTree(){
-        for(TreeNode node : nodes){
-            //看看自己在哪一层
-            int level = getNodeLayerLevel(node);
-
-            StringBuilder sb = new StringBuilder();
-            for(int i=0;i<level;i++){
-                sb.append('\t');
-            }
-
-            System.out.println(sb.toString()+node.getData().toString());
-        }
-    }
-
     private class Couple {
         List<TreeNode> list;
         int curListPos;
@@ -866,6 +858,14 @@ public class ListTree {
                 listStack.pop();
             }
         }while(!listStack.empty());
+    }
+
+    public TreeNode getFirstNode() {
+        if(nodes.isEmpty()){
+            return null;
+        }else {
+            return nodes.get(0);
+        }
     }
 
 }

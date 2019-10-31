@@ -10,6 +10,7 @@ import org.junit.Test;
 public class TreeListTest {
     //保存数据的集合
     ListTree tree = new ListTree();
+    ListTree.TreeNode n101 = null;
 
     @Before
     public void init(){
@@ -38,7 +39,7 @@ public class TreeListTest {
 
         //n10
         ListTree.TreeNode n100=tree.addNode(n10, "1-0-0", 0);
-        ListTree.TreeNode n101=tree.addNode(n10, "1-0-1", 0);
+        n101=tree.addNode(n10, "1-0-1", 0);
         ListTree.TreeNode n102=tree.addNode(n10, "1-0-2", 0);
 
         //n12
@@ -74,40 +75,86 @@ public class TreeListTest {
 //        tree.printList();
 //    }
 
+//    @Test
+//    public void testEnumAll(){
+//        tree.forEach(node -> {
+//            System.out.println(node.getData().toString());
+//        });
+//    }
+
+//    @Test
+//    public void testInsertRootAtFirst(){
+//        tree.insertNode(null,0,"-1",0);
+//        tree.forEach(node -> {
+//            System.out.println(node.getData().toString());
+//        });
+//    }
+
     @Test
-    public void testEnumAll(){
-        tree.forEach(node -> {
+    public void testInverseEnumRootSibling(){
+        //先找到最后一个
+        ListTree.TreeNode node=tree.getFirstNode();
+        for (;;){
+            ListTree.TreeNode tempNode = tree.getNextSibling(node);
+            if(tempNode == null){
+                break;
+            }
+            node = tempNode;
+        }
+
+        while (node!=null){
             System.out.println(node.getData().toString());
+            node=tree.getPrevSibling(node);
+        }
+    }
+
+//    @Test
+//    public void testInsertRootAtLast(){
+//        ListTree.TreeNode node=tree.getFirstNode();
+//        int i=0;
+//        while (node!=null){
+//            i++;
+//            node=tree.getNextSibling(node);
+//        }
+//
+//        tree.insertNode(null,i,"new Node",0);
+//        tree.forEach(n -> {
+//            System.out.println(n.getData().toString());
+//        });
+//    }
+
+//    @Test
+//    public void testInsertChildAtFirst(){
+//        tree.insertNode(n101,0,"1-0-1-new",0);
+//        tree.forEach(node -> {
+//            System.out.println(node.getData().toString());
+//        });
+//    }
+
+//    @Test
+//    public void testInsertChildAtMiddle(){
+//        tree.insertNode(n101,2,"1-0-1-new",0);
+//        tree.forEach(node -> {
+//            System.out.println(node.getData().toString());
+//        });
+//    }
+
+//    @Test
+//    public void testInsertChildAtLast(){
+//        tree.addNode(n101,"1-0-1-new",0);
+//        tree.forEach(node -> {
+//            System.out.println(node.getData().toString());
+//        });
+//    }
+
+    @Test
+    public void testGetNodeIndex(){
+        ListTree.TreeNode node = tree.addNode(n101,"1-0-1-new",0);
+        tree.forEach(n -> {
+            System.out.println(n.getData().toString());
         });
+        System.out.println("new node rand:"+tree.getNodeRank(node));
+        System.out.println("new node plane index:"+tree.getNodePlaneIndex(node));
     }
-
-    public void testInsertRootAtFirst(){
-
-    }
-
-    public void testInsertRootAtLast(){
-
-    }
-
-    public void testInsertChildAtFirst(){
-
-    }
-
-    public void testInsertChildAtMiddle(){
-
-    }
-
-    public void testInsertRootAtLastWhenCollapse(){
-
-    }
-
-    public void testInsertChildAtFirstWhenCollapse(){
-
-    }
-
-    public void testInsertChildAtMiddleWhenCollapse(){
-
-    }
-
 
 }
