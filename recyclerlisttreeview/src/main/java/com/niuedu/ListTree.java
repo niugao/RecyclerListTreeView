@@ -133,9 +133,10 @@ public class ListTree {
             return childrenCount;
         }
 
-        public int getexpandDescendantCount() {
+        public int getExpandDescendantCount() {
             return expandDescendantCount;
         }
+
 
         //仅在处于收起状态时才被调用
         void enumCheckedNodes(EnumOptionFunc optFunc) {
@@ -835,7 +836,7 @@ public class ListTree {
 
     /**
      * 对整个树进行遍历，可以替代enumCheckedNodes方法，只需要对Node的isChecked判断即可
-     * @param optFunc
+     * @param optFunc (node)->{options...}
      */
     public void forEach(EnumOptionFunc optFunc){
         //以树的形式顺序遍历所有节点
@@ -860,6 +861,10 @@ public class ListTree {
         }while(!listStack.empty());
     }
 
+    /**
+     * 获取第一个根Node
+     * @return Node or Null
+     */
     public TreeNode getFirstNode() {
         if(nodes.isEmpty()){
             return null;
@@ -868,4 +873,73 @@ public class ListTree {
         }
     }
 
+    /**
+     * 获取node的第一个孩子
+     * @param node
+     * @return Node or Null
+     */
+    public TreeNode getFirstChild(TreeNode node){
+        if(node.childrenCount==0){
+            return null;
+        }
+        List<TreeNode> nodeList = getNodeContainer(node);
+        return getFirstChild(nodeList,node);
+    }
+
+    private TreeNode getFirstChild(List<TreeNode> nodeList,TreeNode node){
+        if(node.childrenCount==0){
+            return null;
+        }
+
+        if(node.isExpand()){
+            int index=nodeList.indexOf(node);
+            return nodeList.get(index+1);
+        }else {
+            return node.collapseDescendant.get(0);
+        }
+    }
+
+    /**
+     * 获取参数node的最后一个孩子
+     * @param node
+     * @return Node or Null
+     */
+    public TreeNode getLastChild(TreeNode node){
+        if(node.childrenCount==0){
+            return null;
+        }
+
+        List<TreeNode> nodeList = getNodeContainer(node);
+        ListTree.TreeNode child = getFirstChild(nodeList,node);
+        ListTree.TreeNode last = child;
+        while(child!=null) {
+            child = getNextSibling(nodeList, child);
+            last=child;
+        }
+        return last;
+    }
+
+    /**
+     * 跟据排行获取节点
+     * @param parent
+     * @param rank
+     * @return Node or Null
+     */
+    public TreeNode getNodeByRank(TreeNode parent, int rank){
+        if(rank >= parent.childrenCount){
+            return null;
+        }
+
+        List<TreeNode> nodeList = getNodeContainer(parent);
+        ListTree.TreeNode child = getFirstChild(nodeList,parent);
+        int i=0;
+        while(child!=null) {
+            if(i==rank){
+                return child;
+            }
+            child = getNextSibling(nodeList, child);
+            i++;
+        }
+        return null;
+    }
 }

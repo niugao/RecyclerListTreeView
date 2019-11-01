@@ -31,6 +31,12 @@ update:
 - 修正插入节点时的bug；
 - 添加了遍历整棵树的方法forEach()，可以代替enumCheckedNodes()方法，从而去除了唯一一处涉及递归操作的地方；
 - 添加了单元测试；
+
+### 0.1.9 :
+- 添加获取第一个孩子的方法：getFirstChild();
+- 添加获取最小孩子的方法：getLastChild();
+- 添加获取第n个孩子的方法：getNodeByRank();
+
 ---
 
 `基于RecyclerView，自认为是当前最快的 Android tree view 的实现！！`

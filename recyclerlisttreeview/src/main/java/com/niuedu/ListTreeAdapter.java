@@ -125,7 +125,7 @@ public abstract class ListTreeAdapter<VH extends ListTreeAdapter.ListTreeViewHol
             //通知改变爸爸的状态
             super.notifyItemChanged(parentPlaneIndex);
             //通知更新展开的子孙行们
-            notifyItemRangeInserted(parentPlaneIndex + 1, parent.getexpandDescendantCount());
+            notifyItemRangeInserted(parentPlaneIndex + 1, parent.getExpandDescendantCount());
         }
     }
 
