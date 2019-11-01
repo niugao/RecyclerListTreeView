@@ -67,7 +67,7 @@ update:
 
 ## Useage
 
-Gradle : implementation 'com.niuedu:recyclerlisttreeview:0.1.8'
+Gradle : implementation 'com.niuedu:recyclerlisttreeview:0.1.9'
 
 ## Reference
 [CSDN:最快的Android TreeView出现了！](http://blog.csdn.net/nkmnkm/article/details/78985540)
