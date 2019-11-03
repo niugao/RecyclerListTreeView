@@ -147,14 +147,23 @@ public class TreeListTest {
 //        });
 //    }
 
+//    @Test
+//    public void testGetNodeIndexes(){
+//        ListTree.TreeNode node = tree.addNode(n101,"1-0-1-new",0);
+//        tree.forEach(n -> {
+//            System.out.println(n.getData().toString());
+//        });
+//        System.out.println("new node rand:"+tree.getNodeRank(node));
+//        System.out.println("new node plane index:"+tree.getNodePlaneIndex(node));
+//    }
+
     @Test
-    public void testGetNodeIndex(){
-        ListTree.TreeNode node = tree.addNode(n101,"1-0-1-new",0);
-        tree.forEach(n -> {
-            System.out.println(n.getData().toString());
-        });
-        System.out.println("new node rand:"+tree.getNodeRank(node));
-        System.out.println("new node plane index:"+tree.getNodePlaneIndex(node));
+    public void testEnumChildren(){
+        ListTree.TreeNode child = tree.getFirstChild(n101);
+        while (child!=null){
+            System.out.println(child.getData().toString());
+            child = tree.getNextSibling(child);
+        }
     }
 
 }
